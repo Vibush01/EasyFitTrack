@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const RoleSelection = () => {
