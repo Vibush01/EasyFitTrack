@@ -4,8 +4,9 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const GymDashboard = () => {
     const { user, userDetails } = useContext(AuthContext);
     const [requests, setRequests] = useState([]);
@@ -22,7 +23,7 @@ const GymDashboard = () => {
                 });
                 setRequests(res.data);
             } catch (err) {
-                toast.error('Failed to fetch join requests'+err, { position: "top-right" });
+                toast.error('Failed to fetch join requests' + err, { position: "top-right" });
             }
         };
 
@@ -35,7 +36,7 @@ const GymDashboard = () => {
                     });
                     setAnnouncements(res.data);
                 } catch (err) {
-                    toast.error('Failed to fetch announcements'+err, { position: "top-right" });
+                    toast.error('Failed to fetch announcements' + err, { position: "top-right" });
                 }
             }
         };
@@ -117,7 +118,7 @@ const GymDashboard = () => {
             setAnnouncements(announcements.filter((ann) => ann._id !== announcementId));
             toast.success('Announcement deleted', { position: "top-right" });
         } catch (err) {
-            toast.error('Failed to delete announcement'+err, { position: "top-right" });
+            toast.error('Failed to delete announcement' + err, { position: "top-right" });
         }
     };
 
@@ -133,12 +134,12 @@ const GymDashboard = () => {
     };
 
     const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+        hover: { scale: 1.02, transition: { duration: 0.2 } },
     };
 
     if (user?.role !== 'gym' && user?.role !== 'trainer') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
                 <motion.p
                     initial="hidden"
                     animate="visible"
@@ -154,13 +155,13 @@ const GymDashboard = () => {
     const isTrainerInGym = user?.role === 'trainer' && userDetails?.gym;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="container mx-auto">
+        <div className="min-h-screen bg-[var(--bg-primary)] py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+            <div className="container mx-auto max-w-6xl">
                 <motion.h1
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold mb-12 text-center text-[var(--text-primary)] tracking-tight"
                 >
                     {user.role === 'gym' ? 'Gym Dashboard' : 'Trainer Dashboard'}
                 </motion.h1>
@@ -172,14 +173,14 @@ const GymDashboard = () => {
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={fadeIn}
-                        className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
+                        className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] mb-8"
                     >
-                        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Quick Links</h2>
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[var(--text-primary)]">Quick Links</h2>
                         <div className="flex flex-col space-y-4">
                             <motion.div whileHover="hover" variants={buttonHover}>
                                 <Link
                                     to="/gyms"
-                                    className="block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 text-center text-sm sm:text-base font-semibold"
+                                    className="block bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition-all duration-300 text-center text-sm sm:text-base font-bold shadow-lg shadow-blue-600/20"
                                 >
                                     Find Gym
                                 </Link>
@@ -190,52 +191,55 @@ const GymDashboard = () => {
 
                 {/* Announcements Section for Gym Profile */}
                 {user.role === 'gym' && (
-                    <div className="mb-8">
+                    <div className="mb-12">
                         <motion.div
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true }}
                             variants={fadeIn}
-                            className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
+                            className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] mb-8"
                         >
-                            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">
                                 {editAnnouncementId ? 'Edit Announcement' : 'Post Announcement'}
                             </h2>
                             <form onSubmit={handlePostAnnouncement}>
                                 <motion.div variants={fadeIn} className="mb-6">
-                                    <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
+                                    <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
                                         Message
                                     </label>
                                     <textarea
                                         value={announcementForm}
                                         onChange={(e) => setAnnouncementForm(e.target.value)}
-                                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
+                                        className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] placeholder-gray-500 transition-all duration-300"
                                         rows="3"
+                                        placeholder="Type your announcement here..."
                                         required
                                     />
                                 </motion.div>
-                                <motion.button
-                                    type="submit"
-                                    whileHover="hover"
-                                    variants={buttonHover}
-                                    className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base"
-                                >
-                                    {editAnnouncementId ? 'Update Announcement' : 'Post Announcement'}
-                                </motion.button>
-                                {editAnnouncementId && (
+                                <div className="flex gap-4">
                                     <motion.button
-                                        type="button"
-                                        onClick={() => {
-                                            setEditAnnouncementId(null);
-                                            setAnnouncementForm('');
-                                        }}
+                                        type="submit"
                                         whileHover="hover"
                                         variants={buttonHover}
-                                        className="w-full bg-gray-500 text-white p-4 rounded-lg mt-2 hover:bg-gray-600 transition-all duration-300 text-sm sm:text-base font-semibold"
+                                        className="flex-1 bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/20"
                                     >
-                                        Cancel
+                                        {editAnnouncementId ? 'Update' : 'Post'}
                                     </motion.button>
-                                )}
+                                    {editAnnouncementId && (
+                                        <motion.button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditAnnouncementId(null);
+                                                setAnnouncementForm('');
+                                            }}
+                                            whileHover="hover"
+                                            variants={buttonHover}
+                                            className="flex-1 bg-gray-700 text-white p-4 rounded-xl font-bold hover:bg-gray-600 transition-all duration-300"
+                                        >
+                                            Cancel
+                                        </motion.button>
+                                    )}
+                                </div>
                             </form>
                         </motion.div>
 
@@ -244,32 +248,32 @@ const GymDashboard = () => {
                             whileInView="visible"
                             viewport={{ once: true }}
                             variants={fadeIn}
-                            className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
+                            className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
                         >
-                            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Your Announcements</h2>
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">Your Announcements</h2>
                             {announcements.length > 0 ? (
                                 <ul className="space-y-4">
                                     {announcements.map((announcement) => (
                                         <motion.li
                                             key={announcement._id}
-                                            className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300"
+                                            className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-6 rounded-xl hover:border-blue-500/50 transition-all duration-300"
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true }}
                                             variants={zoomIn}
                                         >
-                                            <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                                <strong>Message:</strong> {announcement.message}
+                                            <p className="text-[var(--text-primary)] mb-4 text-lg">
+                                                {announcement.message}
                                             </p>
-                                            <p className="text-gray-600 text-sm sm:text-base">
-                                                <strong>Posted:</strong> {new Date(announcement.timestamp).toLocaleString()}
+                                            <p className="text-[var(--text-secondary)] text-sm mb-4">
+                                                Posted: {new Date(announcement.timestamp).toLocaleString()}
                                             </p>
-                                            <div className="mt-3 flex space-x-2">
+                                            <div className="flex gap-3">
                                                 <motion.button
                                                     onClick={() => handleEditAnnouncement(announcement)}
                                                     whileHover="hover"
                                                     variants={buttonHover}
-                                                    className="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-all duration-300 text-sm sm:text-base"
+                                                    className="px-4 py-2 bg-yellow-600/20 text-yellow-500 border border-yellow-600/50 rounded-lg hover:bg-yellow-600 hover:text-white transition-all duration-300 text-sm font-semibold"
                                                 >
                                                     Edit
                                                 </motion.button>
@@ -277,7 +281,7 @@ const GymDashboard = () => {
                                                     onClick={() => handleDeleteAnnouncement(announcement._id)}
                                                     whileHover="hover"
                                                     variants={buttonHover}
-                                                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-300 text-sm sm:text-base"
+                                                    className="px-4 py-2 bg-red-600/20 text-red-500 border border-red-600/50 rounded-lg hover:bg-red-600 hover:text-white transition-all duration-300 text-sm font-semibold"
                                                 >
                                                     Delete
                                                 </motion.button>
@@ -286,7 +290,14 @@ const GymDashboard = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <p className="text-gray-700 text-center text-sm sm:text-base">No announcements posted yet</p>
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-[var(--text-secondary)]">No announcements posted yet</p>
+                                </div>
                             )}
                         </motion.div>
                     </div>
@@ -299,9 +310,9 @@ const GymDashboard = () => {
                         whileInView="visible"
                         viewport={{ once: true }}
                         variants={fadeIn}
-                        className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
+                        className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
                     >
-                        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">
                             {user.role === 'gym' ? 'Join Requests' : 'Member Join Requests'}
                         </h2>
                         {requests.length > 0 ? (
@@ -309,29 +320,34 @@ const GymDashboard = () => {
                                 {requests.map((request) => (
                                     <motion.li
                                         key={request._id}
-                                        className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300"
+                                        className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-6 rounded-xl hover:border-blue-500/50 transition-all duration-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
                                         initial="hidden"
                                         whileInView="visible"
                                         viewport={{ once: true }}
                                         variants={zoomIn}
                                     >
-                                        <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                            <strong>{request.userModel}:</strong> {request.user.name} ({request.user.email})
-                                        </p>
-                                        {request.userModel === 'Member' && (
-                                            <p className="text-gray-600 text-sm sm:text-base">
-                                                <strong>Membership Duration:</strong> {request.membershipDuration}
+                                        <div>
+                                            <p className="text-[var(--text-primary)] font-bold text-lg mb-1">
+                                                {request.user.name}
                                             </p>
-                                        )}
-                                        <p className="text-gray-600 text-sm sm:text-base">
-                                            <strong>Requested on:</strong> {new Date(request.createdAt).toLocaleDateString()}
-                                        </p>
-                                        <div className="mt-3 flex space-x-2">
+                                            <p className="text-[var(--text-secondary)] text-sm mb-2">
+                                                {request.user.email} • {request.userModel}
+                                            </p>
+                                            {request.userModel === 'Member' && (
+                                                <p className="text-blue-400 text-sm font-medium mb-1">
+                                                    Duration: {request.membershipDuration}
+                                                </p>
+                                            )}
+                                            <p className="text-[var(--text-secondary)] text-xs">
+                                                Requested: {new Date(request.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-3 w-full sm:w-auto">
                                             <motion.button
                                                 onClick={() => handleAccept(request._id)}
                                                 whileHover="hover"
                                                 variants={buttonHover}
-                                                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all duration-300 text-sm sm:text-base"
+                                                className="flex-1 sm:flex-none px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 font-bold shadow-lg shadow-green-600/20"
                                             >
                                                 Accept
                                             </motion.button>
@@ -339,7 +355,7 @@ const GymDashboard = () => {
                                                 onClick={() => handleDeny(request._id)}
                                                 whileHover="hover"
                                                 variants={buttonHover}
-                                                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-300 text-sm sm:text-base"
+                                                className="flex-1 sm:flex-none px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 font-bold shadow-lg shadow-red-600/20"
                                             >
                                                 Deny
                                             </motion.button>
@@ -348,7 +364,14 @@ const GymDashboard = () => {
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-gray-700 text-center text-sm sm:text-base">No pending join requests</p>
+                            <div className="text-center py-12">
+                                <div className="w-16 h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                </div>
+                                <p className="text-[var(--text-secondary)]">No pending join requests</p>
+                            </div>
                         )}
                     </motion.div>
                 )}

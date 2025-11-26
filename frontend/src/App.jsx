@@ -30,120 +30,125 @@ import MembershipManagement from './pages/MembershipManagement';
 import MembershipUpdate from './pages/MembershipUpdate';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PageViewTracker from './components/PageViewTracker';
+import { ThemeProvider } from './context/ThemeContext'; // Assuming ThemeProvider is in ThemeContext.js
 
 function App() {
     return (
         <AuthProvider>
-            <Router>
-                <Navbar />
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/signup" element={<RoleSelection />} />
-                    <Route path="/signup/admin" element={<AdminSignup />} />
-                    <Route path="/signup/gym" element={<GymSignup />} />
-                    <Route path="/signup/trainer" element={<TrainerSignup />} />
-                    <Route path="/signup/member" element={<MemberSignup />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/gyms" element={<GymList />} />
-                    <Route path="/gym/:id" element={<GymProfile />} />
-                    <Route path="/gym-dashboard" element={
-                        <ProtectedRoute>
-                            <GymDashboard />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/macro-calculator" element={
-                        <ProtectedRoute>
-                            <MacroCalculator />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/progress-tracker" element={
-                        <ProtectedRoute>
-                            <ProgressTracker />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/chat" element={
-                        <ProtectedRoute>
-                            <Chat />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/announcements" element={
-                        <ProtectedRoute>
-                            <Announcements />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/workout-plans" element={
-                        <ProtectedRoute>
-                            <WorkoutPlans />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/member-dashboard" element={
-                        <ProtectedRoute>
-                            <MemberDashboard />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/request-plan" element={
-                        <ProtectedRoute>
-                            <RequestPlan />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/manage-schedule" element={
-                        <ProtectedRoute>
-                            <ManageSchedule />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/view-bookings" element={
-                        <ProtectedRoute>
-                            <ViewBookings />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/book-session" element={
-                        <ProtectedRoute>
-                            <BookSession />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/update-gym" element={
-                        <ProtectedRoute>
-                            <UpdateGym />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/admin-dashboard" element={
-                        <ProtectedRoute>
-                            <AdminDashboard />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/membership-management" element={
-                        <ProtectedRoute>
-                            <MembershipManagement />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/membership-update" element={
-                        <ProtectedRoute>
-                            <MembershipUpdate />
-                        </ProtectedRoute>
-                    } />
-                    <Route
-                        path="/profile"
-                        element={
+            <ThemeProvider>
+                <Router>
+                    <PageViewTracker />
+                    <Navbar />
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/signup" element={<RoleSelection />} />
+                        <Route path="/signup/admin" element={<AdminSignup />} />
+                        <Route path="/signup/gym" element={<GymSignup />} />
+                        <Route path="/signup/trainer" element={<TrainerSignup />} />
+                        <Route path="/signup/member" element={<MemberSignup />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/gyms" element={<GymList />} />
+                        <Route path="/gym/:id" element={<GymProfile />} />
+                        <Route path="/gym-dashboard" element={
                             <ProtectedRoute>
-                                <Profile />
+                                <GymDashboard />
                             </ProtectedRoute>
-                        }
+                        } />
+                        <Route path="/macro-calculator" element={
+                            <ProtectedRoute>
+                                <MacroCalculator />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/progress-tracker" element={
+                            <ProtectedRoute>
+                                <ProgressTracker />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/chat" element={
+                            <ProtectedRoute>
+                                <Chat />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/announcements" element={
+                            <ProtectedRoute>
+                                <Announcements />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/workout-plans" element={
+                            <ProtectedRoute>
+                                <WorkoutPlans />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/member-dashboard" element={
+                            <ProtectedRoute>
+                                <MemberDashboard />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/request-plan" element={
+                            <ProtectedRoute>
+                                <RequestPlan />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/manage-schedule" element={
+                            <ProtectedRoute>
+                                <ManageSchedule />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/view-bookings" element={
+                            <ProtectedRoute>
+                                <ViewBookings />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/book-session" element={
+                            <ProtectedRoute>
+                                <BookSession />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/update-gym" element={
+                            <ProtectedRoute>
+                                <UpdateGym />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin-dashboard" element={
+                            <ProtectedRoute>
+                                <AdminDashboard />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/membership-management" element={
+                            <ProtectedRoute>
+                                <MembershipManagement />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/membership-update" element={
+                            <ProtectedRoute>
+                                <MembershipUpdate />
+                            </ProtectedRoute>
+                        } />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                    {/* Toast Container */}
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="light"
                     />
-                </Routes>
-                {/* Toast Container */}
-                <ToastContainer
-                    position="top-right"
-                    autoClose={3000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                />
-            </Router>
+                </Router>
+            </ThemeProvider>
         </AuthProvider>
     );
 }

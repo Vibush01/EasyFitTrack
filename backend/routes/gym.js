@@ -134,17 +134,34 @@ router.put('/update', authMiddleware, upload.array('photos', 5), async (req, res
 
         const { gymName, address, ownerName, ownerEmail, membershipPlans, deletePhotos } = req.body;
 
+        console.log('Received membershipPlans:', membershipPlans); // Add logging
+        console.log('Type of membershipPlans:', typeof membershipPlans); // Check the type
+
         if (gymName) gym.gymName = gymName;
         if (address) gym.address = address;
         if (ownerName) gym.ownerName = ownerName;
         if (ownerEmail) gym.ownerEmail = ownerEmail;
-        if (membershipPlans) gym.membershipPlans = JSON.parse(membershipPlans);
+        if (membershipPlans) {
+            if (typeof membershipPlans !== 'string') {
+                return res.status(400).json({ message: 'membershipPlans must be a JSON string' });
+            }
+            try {
+                gym.membershipPlans = JSON.parse(membershipPlans);
+            } catch (parseError) {
+                console.error('Error parsing membershipPlans:', parseError);
+                return res.status(400).json({ message: 'Invalid membershipPlans format', error: parseError.message });
+            }
+        }
 
         if (deletePhotos) {
             const photosToDelete = JSON.parse(deletePhotos);
             for (const photoUrl of photosToDelete) {
-                const publicId = photoUrl.split('/').pop().split('.')[0];
-                await cloudinary.uploader.destroy(`gym_photos/${publicId}`);
+                const urlParts = photoUrl.split('/');
+                const fileName = urlParts[urlParts.length - 1];
+                const publicId = fileName.split('.')[0];
+                const folderPath = urlParts[urlParts.length - 2];
+                const fullPublicId = `${folderPath}/${publicId}`;
+                await cloudinary.uploader.destroy(fullPublicId);
                 gym.photos = gym.photos.filter((photo) => photo !== photoUrl);
             }
         }
@@ -167,7 +184,6 @@ router.put('/update', authMiddleware, upload.array('photos', 5), async (req, res
 
         await gym.save();
 
-        // Log the gym update event
         const eventLog = new EventLog({
             event: 'Gym Update',
             page: '/update-gym',
@@ -393,7 +409,7 @@ router.delete('/members/:memberId', authMiddleware, async (req, res) => {
     }
 });
 
-// Remove a trainer from the gym (Gym only)
+// // Remove a trainer from the gym (Gym only)
 router.delete('/trainers/:trainerId', authMiddleware, async (req, res) => {
     if (req.user.role !== 'gym') {
         return res.status(403).json({ message: 'Access denied' });
@@ -413,18 +429,6 @@ router.delete('/trainers/:trainerId', authMiddleware, async (req, res) => {
         // Remove trainer from gym
         gym.trainers = gym.trainers.filter((id) => id.toString() !== req.params.trainerId);
         await gym.save();
-        const handleRemoveTrainer = async (trainerId) => {
-            try {
-                const token = localStorage.getItem('token');
-                await axios.delete(`${API_URL}/gym/trainers/${trainerId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setTrainers(trainers.filter((trainer) => trainer._id !== trainerId));
-                toast.success('Trainer removed successfully', { position: "top-right" });
-            } catch (err) {
-                toast.error(err.response?.data?.message || 'Failed to remove trainer', { position: "top-right" });
-            }
-        };
 
         // Clear gym from trainer
         trainer.gym = undefined;
@@ -448,7 +452,6 @@ router.delete('/trainers/:trainerId', authMiddleware, async (req, res) => {
 });
 
 // Get members for membership management (Gym and Trainers)
-
 router.get('/members', authMiddleware, async (req, res) => {
     if (req.user.role !== 'gym' && req.user.role !== 'trainer') {
         return res.status(403).json({ message: 'Access denied' });

@@ -2,8 +2,10 @@ import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { motion } from 'framer-motion';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const MembershipManagement = () => {
     const { user, userDetails } = useContext(AuthContext);
     const [members, setMembers] = useState([]);
@@ -158,104 +160,173 @@ const MembershipManagement = () => {
         return endDate;
     };
 
+    // Animation Variants
+    const fadeIn = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+    };
+
+    const buttonHover = {
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
+    };
+
     if (user?.role !== 'gym' && user?.role !== 'trainer') {
-        return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <p className="text-red-500">Access denied. This page is only for Gym Profiles and Trainers.</p>
-        </div>;
+        return (
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
+                <motion.p
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    className="text-red-500 text-lg sm:text-xl font-semibold text-center"
+                >
+                    Access denied. This page is only for Gym Profiles and Trainers.
+                </motion.p>
+            </div>
+        );
     }
 
     if (user?.role === 'trainer' && !userDetails?.gym) {
-        return <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <p className="text-red-500">You must be associated with a gym to manage memberships.</p>
-        </div>;
+        return (
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
+                <motion.p
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    className="text-red-500 text-lg sm:text-xl font-semibold text-center"
+                >
+                    You must be associated with a gym to manage memberships.
+                </motion.p>
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-8">
-            <div className="container mx-auto">
-                <h1 className="text-3xl font-bold mb-6 text-center">Membership Management</h1>
+        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+            <div className="container mx-auto max-w-6xl">
+                <motion.h1
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
+                >
+                    Membership Management
+                </motion.h1>
 
                 {/* Update Membership Section */}
-                <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Update Membership</h2>
-                    <div className="mb-4">
-                        <label className="block text-gray-700">Select Member</label>
-                        <select
-                            value={selectedMember}
-                            onChange={(e) => setSelectedMember(e.target.value)}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="">Select a member</option>
-                            {members.map((member) => (
-                                <option key={member._id} value={member._id}>
-                                    {member.name} ({member.email})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700">New Membership Duration</label>
-                        <select
-                            value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="">Select duration</option>
-                            <option value="1 week">1 Week</option>
-                            <option value="1 month">1 Month</option>
-                            <option value="3 months">3 Months</option>
-                            <option value="6 months">6 Months</option>
-                            <option value="1 year">1 Year</option>
-                        </select>
-                    </div>
-                    <button
-                        onClick={handleUpdateMembership}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeIn}
+                    className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] mb-8"
+                >
+                    <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                        <span className="bg-blue-600 w-1 h-8 rounded-full mr-3"></span>
                         Update Membership
-                    </button>
-                </div>
+                    </h2>
+                    <div className="flex flex-col md:flex-row gap-6 items-end">
+                        <div className="flex-1 w-full">
+                            <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Select Member</label>
+                            <select
+                                value={selectedMember}
+                                onChange={(e) => setSelectedMember(e.target.value)}
+                                className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select a member</option>
+                                {members.map((member) => (
+                                    <option key={member._id} value={member._id}>
+                                        {member.name} ({member.email})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex-1 w-full">
+                            <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">New Duration</label>
+                            <select
+                                value={duration}
+                                onChange={(e) => setDuration(e.target.value)}
+                                className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select duration</option>
+                                <option value="1 week">1 Week</option>
+                                <option value="1 month">1 Month</option>
+                                <option value="3 months">3 Months</option>
+                                <option value="6 months">6 Months</option>
+                                <option value="1 year">1 Year</option>
+                            </select>
+                        </div>
+                        <motion.button
+                            onClick={handleUpdateMembership}
+                            whileHover="hover"
+                            variants={buttonHover}
+                            className="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all duration-300"
+                        >
+                            Update
+                        </motion.button>
+                    </div>
+                </motion.div>
 
                 {/* Membership Requests Section */}
-                <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Membership Requests</h2>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeIn}
+                    className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] mb-8"
+                >
+                    <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                        <span className="bg-purple-600 w-1 h-8 rounded-full mr-3"></span>
+                        Membership Requests
+                    </h2>
                     {membershipRequests.length > 0 ? (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left">
+                            <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr>
-                                        <th className="p-2">Member</th>
-                                        <th className="p-2">Gym</th>
-                                        <th className="p-2">Requested Duration</th>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Requested On</th>
-                                        <th className="p-2">Actions</th>
+                                    <tr className="border-b border-[var(--border-color)]">
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Member</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Gym</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Duration</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Status</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Requested On</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-[var(--border-color)]">
                                     {membershipRequests.map((request) => (
-                                        <tr key={request._id} className="border-t">
-                                            <td className="p-2">{request.member.name} ({request.member.email})</td>
-                                            <td className="p-2">{request.gym.gymName}</td>
-                                            <td className="p-2">{request.requestedDuration}</td>
-                                            <td className="p-2">{request.status}</td>
-                                            <td className="p-2">{new Date(request.createdAt).toLocaleString()}</td>
-                                            <td className="p-2">
+                                        <tr key={request._id} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                                            <td className="p-4 text-[var(--text-primary)]">
+                                                <div className="font-medium">{request.member.name}</div>
+                                                <div className="text-xs text-[var(--text-secondary)]">{request.member.email}</div>
+                                            </td>
+                                            <td className="p-4 text-[var(--text-secondary)]">{request.gym.gymName}</td>
+                                            <td className="p-4 text-[var(--text-secondary)]">{request.requestedDuration}</td>
+                                            <td className="p-4">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${request.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
+                                                    request.status === 'approved' ? 'bg-green-500/10 text-green-500' :
+                                                        'bg-red-500/10 text-red-500'
+                                                    }`}>
+                                                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-[var(--text-secondary)] text-sm">{new Date(request.createdAt).toLocaleDateString()}</td>
+                                            <td className="p-4">
                                                 {request.status === 'pending' && (
-                                                    <>
-                                                        <button
+                                                    <div className="flex space-x-2">
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
                                                             onClick={() => handleRequestAction(request._id, 'approve')}
-                                                            className="bg-green-600 text-white px-4 py-2 rounded mr-2 hover:bg-green-700"
+                                                            className="bg-green-600/20 text-green-500 px-3 py-1 rounded-lg hover:bg-green-600/30 transition-colors text-sm font-medium"
                                                         >
                                                             Approve
-                                                        </button>
-                                                        <button
+                                                        </motion.button>
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
                                                             onClick={() => handleRequestAction(request._id, 'deny')}
-                                                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                                            className="bg-red-600/20 text-red-500 px-3 py-1 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-medium"
                                                         >
                                                             Deny
-                                                        </button>
-                                                    </>
+                                                        </motion.button>
+                                                    </div>
                                                 )}
                                             </td>
                                         </tr>
@@ -264,44 +335,56 @@ const MembershipManagement = () => {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-700 text-center">No membership requests</p>
+                        <div className="bg-[var(--bg-secondary)] p-8 rounded-xl text-center text-[var(--text-secondary)] italic">
+                            No membership requests found
+                        </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Members List */}
-                <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Current Members</h2>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeIn}
+                    className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] mb-8"
+                >
+                    <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                        <span className="bg-green-600 w-1 h-8 rounded-full mr-3"></span>
+                        Current Members
+                    </h2>
                     {members.length > 0 ? (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left">
+                            <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr>
-                                        <th className="p-2">Name</th>
-                                        <th className="p-2">Email</th>
-                                        <th className="p-2">Membership Duration</th>
-                                        <th className="p-2">End Date</th>
-                                        {user?.role === 'gym' && <th className="p-2">Actions</th>}
+                                    <tr className="border-b border-[var(--border-color)]">
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Name</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Email</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Membership</th>
+                                        <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">End Date</th>
+                                        {user?.role === 'gym' && <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Actions</th>}
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-[var(--border-color)]">
                                     {members.map((member) => (
-                                        <tr key={member._id} className="border-t">
-                                            <td className="p-2">{member.name}</td>
-                                            <td className="p-2">{member.email}</td>
-                                            <td className="p-2">{member.membership?.duration || 'N/A'}</td>
-                                            <td className="p-2">
+                                        <tr key={member._id} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                                            <td className="p-4 text-[var(--text-primary)] font-medium">{member.name}</td>
+                                            <td className="p-4 text-[var(--text-secondary)]">{member.email}</td>
+                                            <td className="p-4 text-[var(--text-secondary)]">{member.membership?.duration || 'N/A'}</td>
+                                            <td className="p-4 text-[var(--text-secondary)]">
                                                 {member.membership?.endDate
                                                     ? new Date(member.membership.endDate).toLocaleDateString()
                                                     : 'N/A'}
                                             </td>
                                             {user?.role === 'gym' && (
-                                                <td className="p-2">
-                                                    <button
+                                                <td className="p-4">
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.05 }}
                                                         onClick={() => handleRemoveMember(member._id)}
-                                                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                                        className="bg-red-600/20 text-red-500 px-3 py-1 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-medium"
                                                     >
                                                         Remove
-                                                    </button>
+                                                    </motion.button>
                                                 </td>
                                             )}
                                         </tr>
@@ -310,36 +393,48 @@ const MembershipManagement = () => {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-700 text-center">No members found</p>
+                        <div className="bg-[var(--bg-secondary)] p-8 rounded-xl text-center text-[var(--text-secondary)] italic">
+                            No members found
+                        </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Trainers List (Gym Only) */}
                 {user?.role === 'gym' && (
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-bold mb-4">Current Trainers</h2>
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeIn}
+                        className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
+                    >
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                            <span className="bg-orange-600 w-1 h-8 rounded-full mr-3"></span>
+                            Current Trainers
+                        </h2>
                         {trainers.length > 0 ? (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left">
+                                <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr>
-                                            <th className="p-2">Name</th>
-                                            <th className="p-2">Email</th>
-                                            <th className="p-2">Actions</th>
+                                        <tr className="border-b border-[var(--border-color)]">
+                                            <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Name</th>
+                                            <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Email</th>
+                                            <th className="p-4 text-[var(--text-secondary)] font-medium text-sm">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-[var(--border-color)]">
                                         {trainers.map((trainer) => (
-                                            <tr key={trainer._id} className="border-t">
-                                                <td className="p-2">{trainer.name}</td>
-                                                <td className="p-2">{trainer.email}</td>
-                                                <td className="p-2">
-                                                    <button
+                                            <tr key={trainer._id} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                                                <td className="p-4 text-[var(--text-primary)] font-medium">{trainer.name}</td>
+                                                <td className="p-4 text-[var(--text-secondary)]">{trainer.email}</td>
+                                                <td className="p-4">
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.05 }}
                                                         onClick={() => handleRemoveTrainer(trainer._id)}
-                                                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                                        className="bg-red-600/20 text-red-500 px-3 py-1 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-medium"
                                                     >
                                                         Remove
-                                                    </button>
+                                                    </motion.button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -347,9 +442,11 @@ const MembershipManagement = () => {
                                 </table>
                             </div>
                         ) : (
-                            <p className="text-gray-700 text-center">No trainers found</p>
+                            <div className="bg-[var(--bg-secondary)] p-8 rounded-xl text-center text-[var(--text-secondary)] italic">
+                                No trainers found
+                            </div>
                         )}
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>

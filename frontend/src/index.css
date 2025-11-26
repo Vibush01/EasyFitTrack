@@ -1,1 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+
+@theme {
+    --color-primary: #3B82F6;
+    --color-primary-dark: #2563EB;
+    --color-secondary: #10B981;
+    --color-dark-bg: #121212;
+    --color-card-bg: #1E1E1E;
+    --color-text-main: #F3F4F6;
+    --color-text-muted: #9CA3AF;
+
+    --font-sans: 'Inter', sans-serif;
+}
+
+@layer base {
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f3f4f6;
+        --bg-card: #ffffff;
+        --text-primary: #111827;
+        --text-secondary: #4b5563;
+        --border-color: #e5e7eb;
+    }
+
+    :root.dark {
+        color-scheme: dark;
+        --bg-primary: #121212;
+        --bg-secondary: #1E1E1E;
+        --bg-card: #1E1E1E;
+        --text-primary: #F3F4F6;
+        --text-secondary: #9CA3AF;
+        --border-color: #374151;
+    }
+
+    body {
+        @apply bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased transition-colors duration-300;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-bold tracking-tight text-[var(--text-primary)];
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/30 active:scale-95;
+    }
+
+    .btn-secondary {
+        @apply px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-gray-500/20 active:scale-95;
+    }
+
+    .input-field {
+        @apply w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] placeholder-gray-500 transition-all duration-300;
+    }
+
+    .card {
+        @apply bg-[var(--bg-card)] rounded-2xl shadow-xl border border-[var(--border-color)] p-6;
+    }
+
+    .glass-panel {
+        @apply bg-[var(--bg-card)]/80 backdrop-blur-lg border border-[var(--border-color)] rounded-2xl shadow-2xl;
+    }
+
+    .container {
+        @apply px-4 mx-auto;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-[var(--bg-secondary)];
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-500/50 rounded-full hover:bg-gray-500/70;
+    }
+}

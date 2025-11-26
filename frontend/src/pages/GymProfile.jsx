@@ -4,8 +4,9 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const GymProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ const GymProfile = () => {
                 setGym(res.data);
             } catch (err) {
                 setError('Failed to fetch gym details');
-                toast.error('Failed to fetch gym details'+err, { position: 'top-right' });
+                toast.error('Failed to fetch gym details' + err, { position: 'top-right' });
             }
         };
 
@@ -57,20 +58,20 @@ const GymProfile = () => {
     };
 
     const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
     };
 
     if (!gym) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
-                <motion.p
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    className="text-gray-700 text-lg sm:text-xl"
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center space-y-4"
                 >
-                    {error || 'Loading...'}
-                </motion.p>
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[var(--text-secondary)] text-lg font-medium">Loading Gym Details...</p>
+                </motion.div>
             </div>
         );
     }
@@ -79,200 +80,254 @@ const GymProfile = () => {
     const isMemberOrTrainer = (user?.role === 'member' || user?.role === 'trainer') && userDetails?.gym === id;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="container mx-auto">
-                <motion.h1
+        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+            <div className="container mx-auto max-w-6xl">
+                <motion.div
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="mb-8 text-center"
                 >
-                    {gym.gymName}
-                </motion.h1>
+                    <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] tracking-tight mb-2">
+                        {gym.gymName}
+                    </h1>
+                    <p className="text-[var(--text-secondary)] text-lg">{gym.address}</p>
+                </motion.div>
+
                 {error && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-red-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-8 text-center"
                     >
                         {error}
-                    </motion.p>
+                    </motion.div>
                 )}
                 {success && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-green-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-500/10 border border-green-500/50 text-green-500 p-4 rounded-xl mb-8 text-center"
                     >
                         {success}
-                    </motion.p>
+                    </motion.div>
                 )}
+
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
+                    className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
                 >
                     {isMemberOrTrainer && (
-                        <motion.p
-                            initial="hidden"
-                            animate="visible"
-                            variants={fadeIn}
-                            className="text-green-600 mb-4 text-center text-sm sm:text-base font-semibold"
-                        >
-                            You are already a {user.role === 'member' ? 'member' : 'trainer'} of this gym.
-                        </motion.p>
+                        <div className="mb-8 bg-green-500/10 border border-green-500/30 p-4 rounded-xl flex items-center justify-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-green-500 font-semibold">
+                                You are a registered {user.role} of this gym
+                            </span>
+                        </div>
                     )}
-                    <p className="text-gray-800 font-medium text-sm sm:text-base mb-2">
-                        <strong>Address:</strong> {gym.address}
-                    </p>
-                    <p className="text-gray-800 font-medium text-sm sm:text-base mb-4">
-                        <strong>Owner:</strong> {gym.ownerName} ({gym.ownerEmail})
-                    </p>
 
-                    <div className="mb-6">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">Photos</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            {gym.photos.length > 0 ? (
-                                gym.photos.map((photo, index) => (
-                                    <motion.img
-                                        key={index}
-                                        src={photo}
-                                        alt={`Gym ${index}`}
-                                        className="w-full h-48 object-cover rounded-lg"
-                                        initial="hidden"
-                                        whileInView="visible"
-                                        viewport={{ once: true }}
-                                        variants={zoomIn}
-                                    />
-                                ))
-                            ) : (
-                                <p className="text-gray-700 text-sm sm:text-base">No photos available</p>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Photos Section */}
+                            <div>
+                                <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                    <span className="bg-blue-600 w-1 h-8 rounded-full mr-3"></span>
+                                    Gallery
+                                </h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {gym.photos.length > 0 ? (
+                                        gym.photos.map((photo, index) => (
+                                            <motion.div
+                                                key={index}
+                                                className="relative group overflow-hidden rounded-xl aspect-video"
+                                                initial="hidden"
+                                                whileInView="visible"
+                                                viewport={{ once: true }}
+                                                variants={zoomIn}
+                                            >
+                                                <img
+                                                    src={photo}
+                                                    alt={`Gym ${index}`}
+                                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            </motion.div>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-full bg-[var(--bg-secondary)] p-8 rounded-xl text-center text-[var(--text-secondary)] italic">
+                                            No photos available
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Membership Plans */}
+                            <div>
+                                <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                    <span className="bg-purple-600 w-1 h-8 rounded-full mr-3"></span>
+                                    Membership Plans
+                                </h2>
+                                {gym.membershipPlans.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {gym.membershipPlans.map((plan, index) => (
+                                            <motion.div
+                                                key={index}
+                                                className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)] hover:border-purple-500/50 transition-all duration-300 group"
+                                                initial="hidden"
+                                                whileInView="visible"
+                                                viewport={{ once: true }}
+                                                variants={zoomIn}
+                                            >
+                                                <h3 className="text-[var(--text-secondary)] text-sm font-medium uppercase tracking-wider mb-2">Duration</h3>
+                                                <p className="text-xl font-bold text-[var(--text-primary)] mb-4">{plan.duration}</p>
+                                                <div className="flex items-baseline">
+                                                    <span className="text-2xl font-bold text-purple-400">Rs {plan.price}</span>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-[var(--bg-secondary)] p-8 rounded-xl text-center text-[var(--text-secondary)] italic">
+                                        No membership plans available
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-8">
+                            {/* Contact Info */}
+                            <div className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)]">
+                                <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">Contact Info</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-[var(--text-secondary)] text-sm mb-1">Owner</p>
+                                        <p className="text-[var(--text-primary)] font-medium">{gym.ownerName}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[var(--text-secondary)] text-sm mb-1">Email</p>
+                                        <p className="text-blue-400 break-all">{gym.ownerEmail}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Join Section */}
+                            {canJoin && (
+                                <motion.div
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    variants={fadeIn}
+                                    className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-6 rounded-xl border border-blue-500/30"
+                                >
+                                    <h3 className="text-xl font-bold mb-4 text-[var(--text-primary)]">Ready to Join?</h3>
+                                    {user.role === 'member' && (
+                                        <div className="mb-4">
+                                            <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                                                Select Duration
+                                            </label>
+                                            <div className="relative">
+                                                <select
+                                                    value={membershipDuration}
+                                                    onChange={(e) => setMembershipDuration(e.target.value)}
+                                                    className="w-full p-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                                                >
+                                                    <option value="1 week">1 Week</option>
+                                                    <option value="1 month">1 Month</option>
+                                                    <option value="3 months">3 Months</option>
+                                                    <option value="6 months">6 Months</option>
+                                                    <option value="1 year">1 Year</option>
+                                                </select>
+                                                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                                    <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <motion.button
+                                        onClick={handleJoinRequest}
+                                        whileHover="hover"
+                                        variants={buttonHover}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all duration-300"
+                                    >
+                                        Send Join Request
+                                    </motion.button>
+                                </motion.div>
                             )}
+
+                            {/* Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-[var(--bg-secondary)] p-4 rounded-xl border border-[var(--border-color)] text-center">
+                                    <p className="text-3xl font-bold text-[var(--text-primary)] mb-1">{gym.members.length}</p>
+                                    <p className="text-[var(--text-secondary)] text-xs uppercase tracking-wider">Members</p>
+                                </div>
+                                <div className="bg-[var(--bg-secondary)] p-4 rounded-xl border border-[var(--border-color)] text-center">
+                                    <p className="text-3xl font-bold text-[var(--text-primary)] mb-1">{gym.trainers.length}</p>
+                                    <p className="text-[var(--text-secondary)] text-xs uppercase tracking-wider">Trainers</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="mb-6">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">Membership Plans</h2>
-                        {gym.membershipPlans.length > 0 ? (
-                            <ul className="space-y-2">
-                                {gym.membershipPlans.map((plan, index) => (
-                                    <motion.li
-                                        key={index}
-                                        className="border border-gray-200 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                        initial="hidden"
-                                        whileInView="visible"
-                                        viewport={{ once: true }}
-                                        variants={zoomIn}
-                                    >
-                                        <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                            <strong>Duration:</strong> {plan.duration}
-                                        </p>
-                                        <p className="text-gray-600 text-sm sm:text-base">
-                                            <strong>Price:</strong> Rs{plan.price}
-                                        </p>
-                                    </motion.li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-700 text-sm sm:text-base">No membership plans available</p>
-                        )}
-                    </div>
-
-                    <div className="mb-6">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">Members</h2>
-                        {gym.members.length > 0 ? (
-                            <ul className="space-y-2">
-                                {gym.members.map((member) => (
-                                    <motion.li
-                                        key={member._id}
-                                        className="border border-gray-200 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                        initial="hidden"
-                                        whileInView="visible"
-                                        viewport={{ once: true }}
-                                        variants={zoomIn}
-                                    >
-                                        <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                            <strong>Name:</strong> {member.name}
-                                        </p>
-                                        {/* <p className="text-gray-600 text-sm sm:text-base">
-                                            <strong>Email:</strong> {member.email}
-                                        </p> */}
-                                    </motion.li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-700 text-sm sm:text-base">No members yet</p>
-                        )}
-                    </div>
-
-                    <div className="mb-6">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">Trainers</h2>
-                        {gym.trainers.length > 0 ? (
-                            <ul className="space-y-2">
-                                {gym.trainers.map((trainer) => (
-                                    <motion.li
-                                        key={trainer._id}
-                                        className="border border-gray-200 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                        initial="hidden"
-                                        whileInView="visible"
-                                        viewport={{ once: true }}
-                                        variants={zoomIn}
-                                    >
-                                        <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                            <strong>Name:</strong> {trainer.name}
-                                        </p>
-                                        <p className="text-gray-600 text-sm sm:text-base">
-                                            <strong>Email:</strong> {trainer.email}
-                                        </p>    
-                                    </motion.li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-700 text-sm sm:text-base">No trainers yet</p>
-                        )}
-                    </div>
-
-                    {canJoin && (
-                        <motion.div
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            variants={fadeIn}
-                            className="mt-6"
-                        >
-                            {user.role === 'member' && (
-                                <motion.div variants={fadeIn} className="mb-4">
-                                    <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                        Membership Duration
-                                    </label>
-                                    <select
-                                        value={membershipDuration}
-                                        onChange={(e) => setMembershipDuration(e.target.value)}
-                                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                    >
-                                        <option value="1 week">1 Week</option>
-                                        <option value="1 month">1 Month</option>
-                                        <option value="3 months">3 Months</option>
-                                        <option value="6 months">6 Months</option>
-                                        <option value="1 year">1 Year</option>
-                                    </select>
-                                </motion.div>
+                    {/* Members & Trainers Lists */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-[var(--border-color)]">
+                        <div>
+                            <h3 className="text-xl font-bold mb-6 text-[var(--text-primary)]">Active Members</h3>
+                            {gym.members.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {gym.members.map((member) => (
+                                        <motion.li
+                                            key={member._id}
+                                            className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-color)] flex items-center space-x-3"
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true }}
+                                            variants={zoomIn}
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                                                {member.name.charAt(0)}
+                                            </div>
+                                            <span className="text-[var(--text-secondary)] font-medium">{member.name}</span>
+                                        </motion.li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-[var(--text-secondary)] italic">No members yet</p>
                             )}
-                            <motion.button
-                                onClick={handleJoinRequest}
-                                whileHover="hover"
-                                variants={buttonHover}
-                                className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base"
-                                aria-label="Send Join Request"
-                            >
-                                Send Join Request
-                            </motion.button>
-                        </motion.div>
-                    )}
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold mb-6 text-[var(--text-primary)]">Our Trainers</h3>
+                            {gym.trainers.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {gym.trainers.map((trainer) => (
+                                        <motion.li
+                                            key={trainer._id}
+                                            className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-color)] flex items-center space-x-3"
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true }}
+                                            variants={zoomIn}
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                                                {trainer.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="text-[var(--text-secondary)] font-medium">{trainer.name}</p>
+                                                <p className="text-[var(--text-secondary)] text-xs">{trainer.email}</p>
+                                            </div>
+                                        </motion.li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-[var(--text-secondary)] italic">No trainers yet</p>
+                            )}
+                        </div>
+                    </div>
                 </motion.div>
             </div>
         </div>

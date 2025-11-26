@@ -13,11 +13,11 @@ const eventLogSchema = new mongoose.Schema({
 eventLogSchema.post('save', async function (doc) {
     try {
         const count = await mongoose.model('EventLog').countDocuments();
-        if (count > 20) {
+        if (count > 1000) {
             const oldestEvents = await mongoose.model('EventLog')
                 .find()
                 .sort({ createdAt: 1 })
-                .limit(count - 20);
+                .limit(count - 1000);
             const idsToDelete = oldestEvents.map(event => event._id);
             await mongoose.model('EventLog').deleteMany({ _id: { $in: idsToDelete } });
         }

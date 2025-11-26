@@ -3,8 +3,9 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const RequestPlan = () => {
     const { user } = useContext(AuthContext);
     const [trainers, setTrainers] = useState([]);
@@ -24,7 +25,7 @@ const RequestPlan = () => {
                 const gymRes = await axios.get(`${API_URL}/gym/${gymId}`);
                 setTrainers(gymRes.data.trainers);
             } catch (err) {
-                toast.error('Failed to fetch trainers'+err, { position: "top-right" });
+                toast.error('Failed to fetch trainers' + err, { position: "top-right" });
             }
         };
 
@@ -36,7 +37,7 @@ const RequestPlan = () => {
                 });
                 setRequests(res.data);
             } catch (err) {
-                toast.error('Failed to fetch plan requests'+err, { position: "top-right" });
+                toast.error('Failed to fetch plan requests' + err, { position: "top-right" });
             }
         };
 
@@ -71,7 +72,7 @@ const RequestPlan = () => {
 
                 setPlans(combinedPlans);
             } catch (err) {
-                toast.error('Failed to fetch plans'+err, { position: "top-right" });
+                toast.error('Failed to fetch plans' + err, { position: "top-right" });
             }
         };
 
@@ -116,12 +117,12 @@ const RequestPlan = () => {
     };
 
     const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
     };
 
     if (user?.role !== 'member') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
                 <motion.p
                     initial="hidden"
                     animate="visible"
@@ -135,157 +136,174 @@ const RequestPlan = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="container mx-auto">
+        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+            {/* Background Elements */}
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center opacity-5 fixed"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/95 to-[var(--bg-primary)] fixed"></div>
+
+            <div className="container mx-auto max-w-6xl relative z-10">
                 <motion.h1
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
                 >
                     Request Workout & Diet Plan
                 </motion.h1>
 
-                {/* Request a Plan */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Request a Plan</h2>
-                    <motion.div variants={fadeIn} className="mb-6">
-                        <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                            Select Trainer
-                        </label>
-                        <select
-                            value={selectedTrainer}
-                            onChange={(e) => setSelectedTrainer(e.target.value)}
-                            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                        >
-                            <option value="">Select a trainer</option>
-                            {trainers.map((trainer) => (
-                                <option key={trainer._id} value={trainer._id}>
-                                    {trainer.name} ({trainer.email})
-                                </option>
-                            ))}
-                        </select>
-                    </motion.div>
-                    <motion.div variants={fadeIn} className="mb-6">
-                        <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                            Request Type
-                        </label>
-                        <select
-                            value={requestType}
-                            onChange={(e) => setRequestType(e.target.value)}
-                            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                        >
-                            <option value="workout">Workout Plan</option>
-                            <option value="diet">Diet Plan</option>
-                        </select>
-                    </motion.div>
-                    <motion.button
-                        onClick={handleRequest}
-                        whileHover="hover"
-                        variants={buttonHover}
-                        className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base"
-                        aria-label="Send Plan Request"
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Request a Plan */}
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeIn}
+                        className="lg:col-span-1 bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] h-fit"
                     >
-                        Send Request
-                    </motion.button>
-                </motion.div>
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                            <span className="bg-blue-600 w-1.5 h-8 rounded-full mr-3"></span>
+                            New Request
+                        </h2>
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Select Trainer</label>
+                                <select
+                                    value={selectedTrainer}
+                                    onChange={(e) => setSelectedTrainer(e.target.value)}
+                                    className="w-full p-4 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                >
+                                    <option value="">Choose a trainer...</option>
+                                    {trainers.map((trainer) => (
+                                        <option key={trainer._id} value={trainer._id}>
+                                            {trainer.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Request Type</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button
+                                        onClick={() => setRequestType('workout')}
+                                        className={`p-4 rounded-xl border transition-all duration-300 ${requestType === 'workout'
+                                            ? 'bg-blue-600 border-blue-600 text-white'
+                                            : 'bg-[var(--bg-secondary)]/50 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-gray-500'
+                                            }`}
+                                    >
+                                        Workout Plan
+                                    </button>
+                                    <button
+                                        onClick={() => setRequestType('diet')}
+                                        className={`p-4 rounded-xl border transition-all duration-300 ${requestType === 'diet'
+                                            ? 'bg-green-600 border-green-600 text-white'
+                                            : 'bg-[var(--bg-secondary)]/50 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-gray-500'
+                                            }`}
+                                    >
+                                        Diet Plan
+                                    </button>
+                                </div>
+                            </div>
+                            <motion.button
+                                onClick={handleRequest}
+                                whileHover="hover"
+                                variants={buttonHover}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300"
+                            >
+                                Send Request
+                            </motion.button>
+                        </div>
+                    </motion.div>
 
-                {/* Your Plan Requests */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Your Plan Requests</h2>
-                    {requests.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm sm:text-base">
-                                <thead>
-                                    <tr className="bg-gray-50">
-                                        <th className="p-3 sm:p-4">Trainer</th>
-                                        <th className="p-3 sm:p-4">Gym</th>
-                                        <th className="p-3 sm:p-4">Request Type</th>
-                                        <th className="p-3 sm:p-4">Status</th>
-                                        <th className="p-3 sm:p-4">Requested On</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Your Plan Requests */}
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeIn}
+                            className="bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
+                        >
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                <span className="bg-yellow-500 w-1.5 h-8 rounded-full mr-3"></span>
+                                Pending Requests
+                            </h2>
+                            {requests.length > 0 ? (
+                                <div className="space-y-4">
                                     {requests.map((request) => (
-                                        <motion.tr
+                                        <motion.div
                                             key={request._id}
-                                            className="border-b hover:bg-gray-50 transition-all duration-300"
-                                            initial="hidden"
-                                            whileInView="visible"
-                                            viewport={{ once: true }}
+                                            className="bg-[var(--bg-secondary)]/50 p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center"
                                             variants={zoomIn}
                                         >
-                                            <td className="p-3 sm:p-4 font-medium text-gray-800">
-                                                {request.trainer.name} ({request.trainer.email})
-                                            </td>
-                                            <td className="p-3 sm:p-4 text-gray-600">{request.gym.gymName}</td>
-                                            <td className="p-3 sm:p-4 text-gray-600">{request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Plan</td>
-                                            <td className="p-3 sm:p-4 text-gray-600">{request.status}</td>
-                                            <td className="p-3 sm:p-4 text-gray-600">{new Date(request.createdAt).toLocaleString()}</td>
-                                        </motion.tr>
+                                            <div>
+                                                <p className="text-[var(--text-primary)] font-semibold">{request.requestType === 'workout' ? 'Workout Plan' : 'Diet Plan'}</p>
+                                                <p className="text-[var(--text-secondary)] text-sm">Trainer: {request.trainer.name}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${request.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
+                                                    request.status === 'approved' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                                                    }`}>
+                                                    {request.status}
+                                                </span>
+                                                <p className="text-[var(--text-secondary)] text-xs mt-1">{new Date(request.createdAt).toLocaleDateString()}</p>
+                                            </div>
+                                        </motion.div>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <p className="text-gray-700 text-center text-sm sm:text-base">No plan requests yet</p>
-                    )}
-                </motion.div>
+                                </div>
+                            ) : (
+                                <p className="text-[var(--text-secondary)] text-center py-4">No pending requests</p>
+                            )}
+                        </motion.div>
 
-                {/* Your Plans */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Your Plans</h2>
-                    {plans.length > 0 ? (
-                        <ul className="space-y-4">
-                            {plans.map((plan, index) => (
-                                <motion.li
-                                    key={index}
-                                    className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
-                                    variants={zoomIn}
-                                >
-                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                        <strong>Trainer:</strong> {plan.trainer.name} ({plan.trainer.email})
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Gym:</strong> {plan.gym.gymName}
-                                    </p>
-                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                        <strong>{plan.type}:</strong> {plan.title}
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Details:</strong> {plan.description}
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Received On:</strong> {new Date(plan.receivedOn).toLocaleString()}
-                                    </p>
-                                </motion.li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-700 text-center text-sm sm:text-base">No plans received yet</p>
-                    )}
-                </motion.div>
+                        {/* Your Plans */}
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeIn}
+                            className="bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
+                        >
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                <span className="bg-purple-600 w-1.5 h-8 rounded-full mr-3"></span>
+                                Your Plans
+                            </h2>
+                            {plans.length > 0 ? (
+                                <div className="space-y-4">
+                                    {plans.map((plan, index) => (
+                                        <motion.div
+                                            key={index}
+                                            className="bg-[var(--bg-secondary)]/50 p-5 rounded-xl border border-[var(--border-color)] hover:border-purple-500/50 transition-all duration-300"
+                                            variants={zoomIn}
+                                        >
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div>
+                                                    <h3 className="text-[var(--text-primary)] font-bold text-lg">{plan.title}</h3>
+                                                    <p className="text-[var(--text-secondary)] text-sm">{plan.type}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[var(--text-secondary)] text-xs">Trainer: {plan.trainer.name}</p>
+                                                    <p className="text-[var(--text-secondary)] text-xs">{new Date(plan.receivedOn).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                            <div className="bg-[var(--bg-primary)]/50 p-4 rounded-lg text-[var(--text-secondary)] text-sm leading-relaxed">
+                                                {plan.description}
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="bg-[var(--bg-secondary)]/50 p-12 rounded-xl text-center border border-[var(--border-color)] border-dashed">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-[var(--text-secondary)] mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <p className="text-[var(--text-secondary)] text-lg font-medium">No plans received yet</p>
+                                    <p className="text-[var(--text-secondary)] text-sm mt-2">Request a plan from your trainer to get started!</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+                </div>
             </div>
         </div>
     );

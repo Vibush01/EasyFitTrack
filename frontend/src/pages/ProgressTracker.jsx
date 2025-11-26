@@ -1,10 +1,32 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { Line } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const ProgressTracker = () => {
     const { user } = useContext(AuthContext);
     const [logs, setLogs] = useState([]);
@@ -15,9 +37,8 @@ const ProgressTracker = () => {
         muscleMass: '',
         fatPercentage: '',
         images: [],
-        deleteImages: [],
     });
-    const [editId, setEditId] = useState(null);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -26,10 +47,12 @@ const ProgressTracker = () => {
                 const res = await axios.get(`${API_URL}/member/progress`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setLogs(res.data);
+                // Sort logs by date ascending for the chart
+                const sortedLogs = res.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                setLogs(sortedLogs);
             } catch (err) {
                 setError('Failed to fetch progress logs');
-                toast.error('Failed to fetch progress logs'+err, { position: 'top-right' });
+                toast.error('Failed to fetch progress logs' + err, { position: 'top-right' });
             }
         };
         if (user?.role === 'member') {
@@ -38,89 +61,96 @@ const ProgressTracker = () => {
     }, [user]);
 
     const handleChange = (e) => {
-        if (e.target.name === 'images') {
-            setFormData({ ...formData, images: Array.from(e.target.files) });
-        } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
-        }
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleDeleteImage = (imageUrl) => {
-        setFormData({
-            ...formData,
-            deleteImages: [...formData.deleteImages, imageUrl],
-            images: formData.images.filter((_, index) => formData.images[index] !== imageUrl),
-        });
+    const handleFileChange = (e) => {
+        setFormData({ ...formData, images: e.target.files });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setUploading(true);
         try {
             const token = localStorage.getItem('token');
-            const formDataToSend = new FormData();
-            formDataToSend.append('weight', formData.weight);
-            formDataToSend.append('muscleMass', formData.muscleMass);
-            formDataToSend.append('fatPercentage', formData.fatPercentage);
-            formData.images.forEach((image) => formDataToSend.append('images', image));
-            if (editId && formData.deleteImages.length > 0) {
-                formDataToSend.append('deleteImages', JSON.stringify(formData.deleteImages));
+            const data = new FormData();
+            data.append('weight', formData.weight);
+            data.append('muscleMass', formData.muscleMass);
+            data.append('fatPercentage', formData.fatPercentage);
+            for (let i = 0; i < formData.images.length; i++) {
+                data.append('images', formData.images[i]);
             }
 
-            let res;
-            if (editId) {
-                res = await axios.put(`${API_URL}/member/progress/${editId}`, formDataToSend, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setLogs(logs.map((log) => (log._id === editId ? res.data.progressLog : log)));
-                setSuccess('Progress log updated');
-                toast.success('Progress log updated', { position: 'top-right' });
-                setEditId(null);
-            } else {
-                res = await axios.post(`${API_URL}/member/progress`, formDataToSend, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                setLogs([res.data.progressLog, ...logs]);
-                setSuccess('Progress logged');
-                toast.success('Progress logged', { position: 'top-right' });
-            }
+            const res = await axios.post(`${API_URL}/member/progress`, data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-            setFormData({ weight: '', muscleMass: '', fatPercentage: '', images: [], deleteImages: [] });
+            setLogs([...logs, res.data.progressLog].sort((a, b) => new Date(a.date) - new Date(b.date)));
+            setSuccess('Progress logged successfully');
+            toast.success('Progress logged successfully', { position: 'top-right' });
+            setFormData({ weight: '', muscleMass: '', fatPercentage: '', images: [] });
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to log progress');
             toast.error(err.response?.data?.message || 'Failed to log progress', { position: 'top-right' });
+        } finally {
+            setUploading(false);
         }
     };
 
-    const handleEdit = (log) => {
-        setFormData({
-            weight: log.weight,
-            muscleMass: log.muscleMass,
-            fatPercentage: log.fatPercentage,
-            images: [],
-            deleteImages: [],
-        });
-        setEditId(log._id);
+    const chartData = {
+        labels: logs.map((log) => new Date(log.date).toLocaleDateString()),
+        datasets: [
+            {
+                label: 'Weight (kg)',
+                data: logs.map((log) => log.weight),
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                tension: 0.4,
+            },
+            {
+                label: 'Muscle Mass (kg)',
+                data: logs.map((log) => log.muscleMass),
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                tension: 0.4,
+            },
+            {
+                label: 'Fat Percentage (%)',
+                data: logs.map((log) => log.fatPercentage),
+                borderColor: '#F59E0B',
+                backgroundColor: 'rgba(245, 158, 11, 0.5)',
+                tension: 0.4,
+            },
+        ],
     };
 
-    const handleDelete = async (id) => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_URL}/member/progress/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setLogs(logs.filter((log) => log._id !== id));
-            setSuccess('Progress log deleted');
-            toast.success('Progress log deleted', { position: 'top-right' });
-        } catch (err) {
-            setError('Failed to delete progress log');
-            toast.error('Failed to delete progress log'+err, { position: 'top-right' });
-        }
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: { color: 'var(--text-secondary)' },
+            },
+            title: {
+                display: true,
+                text: 'Progress Over Time',
+                color: 'var(--text-primary)',
+                font: { size: 16 },
+            },
+        },
+        scales: {
+            y: {
+                grid: { color: 'var(--border-color)' },
+                ticks: { color: 'var(--text-secondary)' },
+            },
+            x: {
+                grid: { color: 'var(--border-color)' },
+                ticks: { color: 'var(--text-secondary)' },
+            },
+        },
     };
 
     // Animation Variants
@@ -135,12 +165,12 @@ const ProgressTracker = () => {
     };
 
     const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
     };
 
     if (user?.role !== 'member') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
                 <motion.p
                     initial="hidden"
                     animate="visible"
@@ -154,238 +184,212 @@ const ProgressTracker = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="container mx-auto">
+        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+            {/* Background Elements */}
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center opacity-5 fixed"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/95 to-[var(--bg-primary)] fixed"></div>
+
+            <div className="container mx-auto max-w-6xl relative z-10">
                 <motion.h1
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
                 >
                     Progress Tracker
                 </motion.h1>
                 {error && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-red-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-8 text-center backdrop-blur-sm"
                     >
                         {error}
-                    </motion.p>
+                    </motion.div>
                 )}
                 {success && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-green-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-500/10 border border-green-500/50 text-green-500 p-4 rounded-xl mb-8 text-center backdrop-blur-sm"
                     >
                         {success}
-                    </motion.p>
+                    </motion.div>
                 )}
 
-                {/* Progress Logging Form */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
-                        {editId ? 'Edit Progress Log' : 'Log Progress'}
-                    </h2>
-                    <form onSubmit={handleSubmit}>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                Weight (kg)
-                            </label>
-                            <input
-                                type="number"
-                                name="weight"
-                                value={formData.weight}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.1"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                required
-                            />
-                        </motion.div>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                Muscle Mass (kg)
-                            </label>
-                            <input
-                                type="number"
-                                name="muscleMass"
-                                value={formData.muscleMass}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.1"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                required
-                            />
-                        </motion.div>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                Fat Percentage (%)
-                            </label>
-                            <input
-                                type="number"
-                                name="fatPercentage"
-                                value={formData.fatPercentage}
-                                onChange={handleChange}
-                                min="0"
-                                max="100"
-                                step="0.1"
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                required
-                            />
-                        </motion.div>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                Images (up to 3)
-                            </label>
-                            <input
-                                type="file"
-                                name="images"
-                                onChange={handleChange}
-                                className="w-full p-4 border border-gray-300 rounded-lg text-sm sm:text-base transition-all duration-300"
-                                multiple
-                                accept="image/*"
-                            />
-                            {editId && logs.find((log) => log._id === editId)?.images?.length > 0 && (
-                                <div className="mt-2">
-                                    <p className="text-gray-800 font-medium text-sm sm:text-base">Existing Images:</p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
-                                        {logs
-                                            .find((log) => log._id === editId)
-                                            .images.map((image, index) => (
-                                                <div key={index} className="relative">
-                                                    <img
-                                                        src={image}
-                                                        alt={`Progress ${index}`}
-                                                        className="w-full h-24 object-cover rounded-lg"
-                                                    />
-                                                    <motion.button
-                                                        type="button"
-                                                        onClick={() => handleDeleteImage(image)}
-                                                        whileHover={{ scale: 1.1 }}
-                                                        className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full text-xs"
-                                                        aria-label="Delete Image"
-                                                    >
-                                                        X
-                                                    </motion.button>
-                                                </div>
-                                            ))}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Progress Logging Form */}
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeIn}
+                        className="lg:col-span-1 bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] h-fit"
+                    >
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                            <span className="bg-blue-600 w-1.5 h-8 rounded-full mr-3"></span>
+                            Log Progress
+                        </h2>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Weight (kg)</label>
+                                <input
+                                    type="number"
+                                    name="weight"
+                                    value={formData.weight}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.1"
+                                    className="w-full p-3 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Muscle Mass (kg)</label>
+                                <input
+                                    type="number"
+                                    name="muscleMass"
+                                    value={formData.muscleMass}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.1"
+                                    className="w-full p-3 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Fat Percentage (%)</label>
+                                <input
+                                    type="number"
+                                    name="fatPercentage"
+                                    value={formData.fatPercentage}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.1"
+                                    className="w-full p-3 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">Progress Photos</label>
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        name="images"
+                                        multiple
+                                        onChange={handleFileChange}
+                                        className="w-full p-3 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all duration-300"
+                                    />
+                                </div>
+                            </div>
+
+                            <motion.button
+                                type="submit"
+                                disabled={uploading}
+                                whileHover={!uploading ? "hover" : {}}
+                                variants={buttonHover}
+                                whileTap={!uploading ? { scale: 0.98 } : {}}
+                                className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300 mt-4 flex justify-center items-center ${uploading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            >
+                                {uploading ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Uploading...
+                                    </>
+                                ) : (
+                                    'Log Progress'
+                                )}
+                            </motion.button>
+                        </form>
+                    </motion.div>
+
+                    {/* Progress Chart and History */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Chart */}
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeIn}
+                            className="bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-[var(--border-color)]"
+                        >
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                <span className="bg-purple-600 w-1.5 h-8 rounded-full mr-3"></span>
+                                Analytics
+                            </h2>
+                            <div className="h-80 w-full">
+                                {logs.length > 0 ? (
+                                    <Line data={chartData} options={chartOptions} />
+                                ) : (
+                                    <div className="h-full flex items-center justify-center text-[var(--text-secondary)]">
+                                        No data available for chart
                                     </div>
+                                )}
+                            </div>
+                        </motion.div>
+
+                        {/* Recent Logs */}
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeIn}
+                            className="bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border border-[var(--border-color)]"
+                        >
+                            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                                <span className="bg-green-600 w-1.5 h-8 rounded-full mr-3"></span>
+                                Recent Logs
+                            </h2>
+                            {logs.length > 0 ? (
+                                <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                                    {[...logs].reverse().map((log) => (
+                                        <motion.div
+                                            key={log._id}
+                                            className="bg-[var(--bg-secondary)]/50 p-5 rounded-xl border border-[var(--border-color)] hover:border-green-500/50 transition-all duration-300"
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true }}
+                                            variants={zoomIn}
+                                        >
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <p className="text-[var(--text-secondary)] text-xs font-medium bg-[var(--bg-primary)] px-2 py-1 rounded-full inline-block mb-2">
+                                                        {new Date(log.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                                    </p>
+                                                    <div className="flex gap-4 text-sm sm:text-base">
+                                                        <span className="text-[var(--text-primary)]"><span className="font-bold text-blue-400">Weight:</span> {log.weight} kg</span>
+                                                        <span className="text-[var(--text-primary)]"><span className="font-bold text-green-400">Muscle:</span> {log.muscleMass} kg</span>
+                                                        <span className="text-[var(--text-primary)]"><span className="font-bold text-yellow-400">Fat:</span> {log.fatPercentage}%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {log.images && log.images.length > 0 && (
+                                                <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                                                    {log.images.map((img, idx) => (
+                                                        <img
+                                                            key={idx}
+                                                            src={`${API_URL.replace('/api', '')}${img}`}
+                                                            alt={`Progress ${idx + 1}`}
+                                                            className="w-20 h-20 object-cover rounded-lg border border-[var(--border-color)] hover:scale-110 transition-transform duration-300 cursor-pointer"
+                                                            onClick={() => window.open(`${API_URL.replace('/api', '')}${img}`, '_blank')}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-[var(--text-secondary)]">
+                                    No logs found. Start tracking your progress!
                                 </div>
                             )}
                         </motion.div>
-                        <motion.button
-                            type="submit"
-                            whileHover="hover"
-                            variants={buttonHover}
-                            className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base"
-                            aria-label={editId ? 'Update Progress Log' : 'Log Progress'}
-                        >
-                            {editId ? 'Update' : 'Log Progress'}
-                        </motion.button>
-                        {editId && (
-                            <motion.button
-                                type="button"
-                                onClick={() => {
-                                    setEditId(null);
-                                    setFormData({ weight: '', muscleMass: '', fatPercentage: '', images: [], deleteImages: [] });
-                                }}
-                                whileHover="hover"
-                                variants={buttonHover}
-                                className="w-full bg-gray-500 text-white p-4 rounded-lg mt-2 hover:bg-gray-600 transition-all duration-300 text-sm sm:text-base font-semibold"
-                                aria-label="Cancel Edit"
-                            >
-                                Cancel
-                            </motion.button>
-                        )}
-                    </form>
-                </motion.div>
-
-                {/* Progress Logs */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Progress Logs</h2>
-                    {logs.length > 0 ? (
-                        <ul className="space-y-4">
-                            {logs.map((log) => (
-                                <motion.li
-                                    key={log._id}
-                                    className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
-                                    variants={zoomIn}
-                                >
-                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                        <strong>Weight:</strong> {log.weight} kg
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Muscle Mass:</strong> {log.muscleMass} kg
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Fat Percentage:</strong> {log.fatPercentage}%
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Date:</strong> {new Date(log.date).toLocaleString()}
-                                    </p>
-                                    {log.images.length > 0 && (
-                                        <div className="mt-2">
-                                            <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                                <strong>Images:</strong>
-                                            </p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
-                                                {log.images.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt={`Progress ${index}`}
-                                                        className="w-full h-24 object-cover rounded-lg"
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div className="mt-3 flex space-x-2">
-                                        <motion.button
-                                            onClick={() => handleEdit(log)}
-                                            whileHover="hover"
-                                            variants={buttonHover}
-                                            className="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-all duration-300 text-sm sm:text-base"
-                                            aria-label="Edit Progress Log"
-                                        >
-                                            Edit
-                                        </motion.button>
-                                        <motion.button
-                                            onClick={() => handleDelete(log._id)}
-                                            whileHover="hover"
-                                            variants={buttonHover}
-                                            className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-300 text-sm sm:text-base"
-                                            aria-label="Delete Progress Log"
-                                        >
-                                            Delete
-                                        </motion.button>
-                                    </div>
-                                </motion.li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-700 text-center text-sm sm:text-base">No progress logs yet</p>
-                    )}
-                </motion.div>
+                    </div>
+                </div>
             </div>
         </div>
     );

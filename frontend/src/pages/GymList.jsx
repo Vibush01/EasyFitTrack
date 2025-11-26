@@ -4,8 +4,8 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 const GymList = () => {
     const { user } = useContext(AuthContext);
     const [gyms, setGyms] = useState([]);
@@ -18,7 +18,7 @@ const GymList = () => {
                 setGyms(res.data);
             } catch (err) {
                 setError('Failed to fetch gyms');
-                toast.error('Failed to fetch gyms'+err, { position: 'top-right' });
+                toast.error('Failed to fetch gyms' + err, { position: 'top-right' });
             }
         };
         fetchGyms();
@@ -41,7 +41,7 @@ const GymList = () => {
 
     if (user?.role !== 'member' && user?.role !== 'trainer') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
                 <motion.p
                     initial="hidden"
                     animate="visible"
@@ -55,13 +55,13 @@ const GymList = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[var(--bg-primary)] py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
             <div className="container mx-auto">
                 <motion.h1
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
                 >
                     Available Gyms
                 </motion.h1>
@@ -79,14 +79,14 @@ const GymList = () => {
                     {gyms.map((gym) => (
                         <motion.div
                             key={gym._id}
-                            className="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                            className="bg-[var(--bg-card)] p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-[var(--border-color)]"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true }}
                             variants={zoomIn}
                         >
-                            <h2 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">{gym.gymName}</h2>
-                            <p className="text-gray-600 text-sm sm:text-base mb-4">{gym.address}</p>
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2 text-[var(--text-primary)]">{gym.gymName}</h2>
+                            <p className="text-[var(--text-secondary)] text-sm sm:text-base mb-4">{gym.address}</p>
                             <motion.div whileHover="hover" variants={buttonHover}>
                                 <Link
                                     to={`/gym/${gym._id}`}

@@ -21,13 +21,20 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST'],
+        origin: ['https://befit.vibushdigital.com', 'https://easyfittrack.netlify.app', 'http://localhost:5173'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
     },
 });
 
+
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['https://befit.vibushdigital.com', 'https://easyfittrack.netlify.app', 'http://localhost:5173'], // Allow your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+}));
+
+// Middleware
 app.use(express.json());
 
 // Connect to MongoDB and Cloudinary
@@ -59,6 +66,7 @@ io.on('connection', (socket) => {
                 receiverModel,
                 gym: gymId,
                 message,
+                status: 'sent',
             });
 
             await chatMessage.save();
@@ -67,6 +75,22 @@ io.on('connection', (socket) => {
             io.to(gymId).emit('message', chatMessage);
         } catch (error) {
             console.error('Error saving message:', error);
+        }
+    });
+
+    // Handle marking messages as read
+    socket.on('markMessagesAsRead', async ({ senderId, receiverId, gymId }) => {
+        try {
+            // Update all messages sent by senderId to receiverId that are 'sent' to 'read'
+            await ChatMessage.updateMany(
+                { sender: senderId, receiver: receiverId, status: 'sent' },
+                { $set: { status: 'read' } }
+            );
+
+            // Emit event to notify the sender that their messages were read
+            io.to(gymId).emit('messagesRead', { senderId, receiverId });
+        } catch (error) {
+            console.error('Error marking messages as read:', error);
         }
     });
 
@@ -83,11 +107,12 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/trainer', trainerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Test Route
 app.get('/api/test', (req, res) => {
     res.json({ message: 'Backend is running' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

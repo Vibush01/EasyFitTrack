@@ -2,8 +2,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const Home = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -56,35 +58,53 @@ const Home = () => {
     };
 
     return (
-        <div className="bg-gray-50">
+        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-x-hidden transition-colors duration-300">
             {/* Hero Section */}
             <motion.section
                 initial="hidden"
                 animate="visible"
                 variants={fadeIn}
-                className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white py-24 overflow-hidden"
+                className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
             >
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center opacity-20"></div>
-                <div className="relative container mx-auto text-center px-4">
+                {/* Background Elements */}
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center opacity-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/80 via-[var(--bg-primary)]/50 to-[var(--bg-primary)]"></div>
+
+                <div className="relative container mx-auto px-6 text-center z-10">
+                    <motion.div variants={fadeIn} className="inline-block mb-4 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 backdrop-blur-sm">
+                        <span className="text-blue-400 font-semibold tracking-wide uppercase text-sm">Welcome to the Future of Fitness</span>
+                    </motion.div>
+
                     <motion.h1
                         variants={fadeIn}
-                        className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight drop-shadow-lg"
+                        className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight tracking-tight text-[var(--text-primary)]"
                     >
-                        Transform Your Fitness with BeFit
+                        Transform Your <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">Body & Mind</span>
                     </motion.h1>
+
                     <motion.p
                         variants={fadeIn}
-                        className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto drop-shadow-md"
+                        className="text-xl md:text-2xl text-[var(--text-secondary)] mb-12 max-w-3xl mx-auto leading-relaxed"
                     >
-                        Join a community where gym owners, trainers, and members unite to achieve wellness goals seamlessly.
+                        The ultimate ecosystem connecting gym owners, elite trainers, and members.
+                        Elevate your fitness journey with data-driven insights and community support.
                     </motion.p>
-                    <motion.a
-                        href="#contact"
-                        variants={zoomIn}
-                        className="inline-block bg-white text-blue-600 px-10 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
-                    >
-                        Get Started Now
-                    </motion.a>
+
+                    <motion.div variants={zoomIn} className="flex flex-col sm:flex-row gap-6 justify-center">
+                        <a
+                            href="#contact"
+                            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-1"
+                        >
+                            Start Your Journey
+                        </a>
+                        <a
+                            href="#features"
+                            className="px-8 py-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+                        >
+                            Explore Features
+                        </a>
+                    </motion.div>
                 </div>
             </motion.section>
 
@@ -94,39 +114,41 @@ const Home = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                className="py-24 bg-white"
+                className="py-32 bg-[var(--bg-primary)]"
             >
-                <div className="container mx-auto px-4">
-                    <motion.h2
-                        variants={fadeIn}
-                        className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 tracking-tight"
-                    >
-                        Discover BeFit
-                    </motion.h2>
-                    <div className="flex flex-col md:flex-row items-center gap-12">
-                        <motion.div
-                            variants={slideInLeft}
-                            className="flex-1"
-                        >
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col lg:flex-row items-center gap-16">
+                        <motion.div variants={slideInLeft} className="flex-1 relative group">
+                            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-30 blur-xl group-hover:opacity-50 transition duration-500"></div>
                             <img
                                 src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
                                 alt="Fitness"
-                                className="w-full h-96 object-cover rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-500"
+                                className="relative w-full h-[500px] object-cover rounded-2xl shadow-2xl"
                             />
                         </motion.div>
-                        <motion.div
-                            variants={slideInRight}
-                            className="flex-1"
-                        >
-                            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                                BeFit is your all-in-one fitness platform, designed to empower gym owners, trainers, and members in their pursuit of health and wellness. We provide a seamless ecosystem where technology meets fitness, offering tools to manage gyms, create personalized training plans, and track progress effectively.
-                            </p>
-                            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                                From real-time communication to advanced progress tracking, BeFit ensures that every user—whether a beginner or a seasoned athlete—has the resources they need to succeed. Our platform fosters a supportive community, bridging the gap between fitness professionals and enthusiasts.
-                            </p>
-                            <p className="text-lg text-gray-700 leading-relaxed">
-                                Join BeFit today and experience a fitness journey like never before. Let’s build a healthier, stronger future together.
-                            </p>
+
+                        <motion.div variants={slideInRight} className="flex-1">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight text-[var(--text-primary)]">
+                                More Than Just a <span className="text-blue-500">Gym Platform</span>
+                            </h2>
+                            <div className="space-y-6 text-lg text-[var(--text-secondary)]">
+                                <p>
+                                    BeFit is your all-in-one fitness command center. We've reimagined how gyms operate and how members achieve their goals by bridging the gap between technology and physical wellness.
+                                </p>
+                                <p>
+                                    Whether you're a gym owner looking to streamline operations, a trainer wanting to scale your impact, or a member chasing a new PR, our platform provides the tools you need to succeed.
+                                </p>
+                                <div className="pt-6 grid grid-cols-2 gap-8">
+                                    <div>
+                                        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">10k+</h3>
+                                        <p className="text-sm uppercase tracking-wider text-[var(--text-secondary)]">Active Members</p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-2">500+</h3>
+                                        <p className="text-sm uppercase tracking-wider text-[var(--text-secondary)]">Partner Gyms</p>
+                                    </div>
+                                </div>
+                            </div>
                         </motion.div>
                     </div>
                 </div>
@@ -134,103 +156,51 @@ const Home = () => {
 
             {/* Features Section */}
             <motion.section
+                id="features"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                className="py-24 bg-gray-100"
+                className="py-32 bg-[var(--bg-secondary)]"
             >
-                <div className="container mx-auto px-4">
-                    <motion.h2
-                        variants={fadeIn}
-                        className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 tracking-tight"
-                    >
-                        Why BeFit Stands Out
-                    </motion.h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
-                        >
-                            <div className="text-blue-600 mb-6">
-                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a2 2 0 012-2h2a2 2 0 012 2v5m-4 0h4"></path>
-                                </svg>
-                            </div>
-                            <h3 className="text-2xl font-semibold mb-4 text-gray-800">Gym Management</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Streamline gym operations with tools to manage trainers, members, membership plans, and join requests effortlessly.
-                            </p>
-                        </motion.div>
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
-                        >
-                            <div className="text-blue-600 mb-6">
-                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <h3 className="text-2xl font-semibold mb-4 text-gray-800">Trainer Support</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Empower trainers with features to create tailored workout and diet plans, schedule sessions, and engage with clients in real-time.
-                            </p>
-                        </motion.div>
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
-                        >
-                            <div className="text-blue-600 mb-6">
-                                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <h3 className="text-2xl font-semibold mb-4 text-gray-800">Member Tools</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Equip members with progress tracking, macro calculators, session booking, and community engagement tools for a complete fitness experience.
-                            </p>
-                        </motion.div>
+                <div className="container mx-auto px-6">
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[var(--text-primary)]">Why Choose <span className="text-blue-500">BeFit</span>?</h2>
+                        <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">Comprehensive tools designed for every role in the fitness ecosystem.</p>
                     </div>
-                </div>
-            </motion.section>
 
-            {/* Mission Section */}
-            <motion.section
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                className="py-24 bg-white"
-            >
-                <div className="container mx-auto px-4">
-                    <motion.h2
-                        variants={fadeIn}
-                        className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 tracking-tight"
-                    >
-                        Our Mission
-                    </motion.h2>
-                    <div className="flex flex-col md:flex-row items-center gap-12">
-                        <motion.div
-                            variants={slideInLeft}
-                            className="flex-1"
-                        >
-                            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                                At BeFit, our mission is to redefine the fitness landscape by creating a platform that inspires collaboration, motivation, and achievement. We are committed to empowering every user—gym owners, trainers, and members—with cutting-edge tools to take charge of their fitness journeys.
-                            </p>
-                            <p className="text-lg text-gray-700 leading-relaxed">
-                                Fitness is more than physical strength; it’s about community and support. BeFit connects fitness professionals with enthusiasts, ensuring access to the guidance and resources needed to succeed. Let’s build a healthier future together.
-                            </p>
-                        </motion.div>
-                        <motion.div
-                            variants={slideInRight}
-                            className="flex-1"
-                        >
-                            <img
-                                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
-                                alt="Mission"
-                                className="w-full h-96 object-cover rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-500"
-                            />
-                        </motion.div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                title: "Gym Management",
+                                desc: "Streamline operations with automated member tracking, billing, and staff management.",
+                                icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a2 2 0 012-2h2a2 2 0 012 2v5m-4 0h4"
+                            },
+                            {
+                                title: "Trainer Support",
+                                desc: "Create personalized workout plans, track client progress, and schedule sessions effortlessly.",
+                                icon: "M13 10V3L4 14h7v7l9-11h-7z"
+                            },
+                            {
+                                title: "Member Success",
+                                desc: "Access macro calculators, progress tracking, and booking tools to crush your goals.",
+                                icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            }
+                        ].map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                variants={zoomIn}
+                                className="bg-[var(--bg-card)] p-8 rounded-2xl border border-[var(--border-color)] hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 group"
+                            >
+                                <div className="w-16 h-16 bg-blue-600/10 rounded-xl flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-colors duration-300">
+                                    <svg className="w-8 h-8 text-blue-500 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.icon}></path>
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 text-[var(--text-primary)]">{feature.title}</h3>
+                                <p className="text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
             </motion.section>
@@ -241,160 +211,165 @@ const Home = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                className="py-24 bg-gray-100"
+                className="py-32 bg-[var(--bg-primary)]"
             >
-                <div className="container mx-auto px-4">
-                    <motion.h2
-                        variants={fadeIn}
-                        className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 tracking-tight"
-                    >
-                        Voices of Our Community
-                    </motion.h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-500"
-                        >
-                            <p className="text-gray-600 mb-6 italic leading-relaxed">
-                                "BeFit has transformed the way I manage my gym. The platform is intuitive, and I can easily oversee my trainers and members. Highly recommend!"
-                            </p>
-                            <p className="text-gray-800 font-semibold text-lg">– John Doe, Gym Owner</p>
-                        </motion.div>
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-500"
-                        >
-                            <p className="text-gray-600 mb-6 italic leading-relaxed">
-                                "As a trainer, BeFit makes my job so much easier. I can create plans, schedule sessions, and chat with my clients all in one place."
-                            </p>
-                            <p className="text-gray-800 font-semibold text-lg">– Jane Smith, Personal Trainer</p>
-                        </motion.div>
-                        <motion.div
-                            variants={zoomIn}
-                            className="bg-white p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-500"
-                        >
-                            <p className="text-gray-600 mb-6 italic leading-relaxed">
-                                "I love how BeFit helps me track my progress and connect with my trainer. It’s the best fitness app I’ve ever used!"
-                            </p>
-                            <p className="text-gray-800 font-semibold text-lg">– Mike Johnson, Member</p>
-                        </motion.div>
+                <div className="container mx-auto px-6">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-20 text-[var(--text-primary)]">Community <span className="text-blue-500">Voices</span></h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                quote: "BeFit has transformed the way I manage my gym. The platform is intuitive, and I can easily oversee my trainers and members.",
+                                author: "John Doe",
+                                role: "Gym Owner"
+                            },
+                            {
+                                quote: "As a trainer, BeFit makes my job so much easier. I can create plans, schedule sessions, and chat with my clients all in one place.",
+                                author: "Jane Smith",
+                                role: "Personal Trainer"
+                            },
+                            {
+                                quote: "I love how BeFit helps me track my progress and connect with my trainer. It’s the best fitness app I’ve ever used!",
+                                author: "Mike Johnson",
+                                role: "Member"
+                            }
+                        ].map((testimonial, index) => (
+                            <motion.div
+                                key={index}
+                                variants={zoomIn}
+                                className="bg-[var(--bg-card)] p-10 rounded-2xl relative"
+                            >
+                                <div className="absolute top-8 left-8 text-blue-600 opacity-20">
+                                    <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.896 14.912 16 16.017 16H19.017C19.569 16 20.017 15.552 20.017 15V9C20.017 8.448 19.569 8 19.017 8H15.017C14.465 8 14.017 8.448 14.017 9V11C14.017 11.552 13.569 12 13.017 12H12.017V5H22.017V15C22.017 18.314 19.331 21 16.017 21H14.017ZM5.01697 21L5.01697 18C5.01697 16.896 5.91197 16 7.01697 16H10.017C10.569 16 11.017 15.552 11.017 15V9C11.017 8.448 10.569 8 10.017 8H6.01697C5.46497 8 5.01697 8.448 5.01697 9V11C5.01697 11.552 4.56897 12 4.01697 12H3.01697V5H13.017V15C13.017 18.314 10.331 21 7.01697 21H5.01697Z" /></svg>
+                                </div>
+                                <p className="text-[var(--text-secondary)] mb-8 relative z-10 leading-relaxed pt-8">"{testimonial.quote}"</p>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center font-bold text-xl text-blue-500">
+                                        {testimonial.author[0]}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-[var(--text-primary)]">{testimonial.author}</p>
+                                        <p className="text-sm text-blue-500">{testimonial.role}</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
             </motion.section>
 
             {/* Contact Section */}
             <motion.section
+                id="contact"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                id="contact"
-                className="py-24 bg-white"
+                className="py-32 bg-[var(--bg-secondary)]"
             >
-                <div className="container mx-auto px-4">
-                    <motion.h2
-                        variants={fadeIn}
-                        className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 tracking-tight"
-                    >
-                        Get in Touch
-                    </motion.h2>
-                    <motion.div
-                        variants={fadeIn}
-                        className="max-w-xl mx-auto bg-gray-50 p-10 rounded-2xl shadow-2xl"
-                    >
-                        <form onSubmit={handleSubmit}>
-                            <motion.div variants={fadeIn} className="mb-6">
-                                <label className="block text-gray-800 font-semibold mb-2">Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300"
-                                    required
-                                />
-                            </motion.div>
-                            <motion.div variants={fadeIn} className="mb-6">
-                                <label className="block text-gray-800 font-semibold mb-2">Email</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300"
-                                    required
-                                />
-                            </motion.div>
-                            <motion.div variants={fadeIn} className="mb-6">
-                                <label className="block text-gray-800 font-semibold mb-2">Phone</label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300"
-                                    required
-                                />
-                            </motion.div>
-                            <motion.div variants={fadeIn} className="mb-6">
-                                <label className="block text-gray-800 font-semibold mb-2">Subject</label>
-                                <input
-                                    type="text"
-                                    name="subject"
-                                    value={formData.subject}
-                                    onChange={handleChange}
-                                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300"
-                                    required
-                                />
-                            </motion.div>
-                            <motion.div variants={fadeIn} className="mb-6">
-                                <label className="block text-gray-800 font-semibold mb-2">Message</label>
-                                <textarea
-                                    name="message"
-                                    value={formData.message}
-                                    onChange={handleChange}
-                                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300"
-                                    rows="5"
-                                    required
-                                />
-                            </motion.div>
-                            <motion.button
-                                type="submit"
-                                variants={zoomIn}
-                                className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-                            >
-                                Send Message
-                            </motion.button>
-                        </form>
-                    </motion.div>
+                <div className="container mx-auto px-6">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[var(--text-primary)]">Get in <span className="text-blue-500">Touch</span></h2>
+                            <p className="text-[var(--text-secondary)]">Have questions? We'd love to hear from you.</p>
+                        </div>
+
+                        <motion.div
+                            variants={fadeIn}
+                            className="bg-[var(--bg-card)] p-8 md:p-12 rounded-3xl border border-[var(--border-color)] shadow-2xl"
+                        >
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Name</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] transition-all"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Email</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] transition-all"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] transition-all"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Subject</label>
+                                        <input
+                                            type="text"
+                                            name="subject"
+                                            value={formData.subject}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] transition-all"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Message</label>
+                                    <textarea
+                                        name="message"
+                                        value={formData.message}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[var(--text-primary)] transition-all h-32 resize-none"
+                                        required
+                                    />
+                                </div>
+
+                                <motion.button
+                                    type="submit"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-600/20 transition-all duration-300"
+                                >
+                                    Send Message
+                                </motion.button>
+                            </form>
+                        </motion.div>
+                    </div>
                 </div>
             </motion.section>
 
             {/* Footer */}
-            <motion.footer
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                className="bg-gray-900 text-white py-12"
-            >
-                <div className="container mx-auto px-4 text-center">
-                    <motion.p
-                        variants={fadeIn}
-                        className="text-lg mb-6"
-                    >
-                        © 2025 BeFit. All rights reserved.
-                    </motion.p>
-                    <motion.div
-                        variants={fadeIn}
-                        className="flex justify-center space-x-6"
-                    >
-                        <a href="#" className="text-gray-400 hover:text-blue-400 transition-all duration-300">Privacy Policy</a>
-                        <a href="#" className="text-gray-400 hover:text-blue-400 transition-all duration-300">Terms of Service</a>
-                        <a href="#contact" className="text-gray-400 hover:text-blue-400 transition-all duration-300">Contact Us</a>
-                    </motion.div>
+            <footer className="bg-[var(--bg-secondary)] text-[var(--text-secondary)] py-12 border-t border-[var(--border-color)]">
+                <div className="container mx-auto px-6 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-8">
+                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-xl">B</span>
+                        </div>
+                        <span className="text-[var(--text-primary)] text-2xl font-bold">Be<span className="text-blue-500">Fit</span></span>
+                    </div>
+                    <p className="mb-8">© 2025 BeFit. All rights reserved.</p>
+                    <div className="flex justify-center space-x-8">
+                        <a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-blue-500 transition-colors">Terms of Service</a>
+                        <a href="#contact" className="hover:text-blue-500 transition-colors">Contact Us</a>
+                    </div>
                 </div>
-            </motion.footer>
+            </footer>
         </div>
     );
 };

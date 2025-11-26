@@ -158,7 +158,7 @@ router.get('/announcements', authMiddleware, async (req, res) => {
         }
 
         const announcements = await Announcement.find({ gym: member.gym })
-            .populate('sender', 'name email')
+            .populate('sender', 'name email gymName')
             .sort({ timestamp: -1 });
 
         res.json(announcements);
@@ -175,7 +175,7 @@ router.get('/announcements/gym', authMiddleware, async (req, res) => {
 
     try {
         const announcements = await Announcement.find({ gym: req.user.id })
-            .populate('sender', 'name email')
+            .populate('sender', 'name email gymName')
             .sort({ timestamp: -1 });
 
         res.json(announcements);

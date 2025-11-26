@@ -4,8 +4,9 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const Profile = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -86,116 +87,128 @@ const Profile = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
     };
 
-    const zoomIn = {
-        hidden: { opacity: 0, scale: 0.9 },
-        visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+    const buttonHover = {
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
     };
 
-    const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+    const logoutHover = {
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(239, 68, 68, 0.4)', transition: { duration: 0.3 } },
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 transition-colors duration-300">
             <motion.div
                 initial="hidden"
                 animate="visible"
                 variants={fadeIn}
-                className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md"
+                className="bg-[var(--bg-card)] p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] w-full max-w-md relative overflow-hidden"
             >
+                {/* Background Glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-600 blur-md opacity-75"></div>
+
                 <motion.h1
                     variants={fadeIn}
-                    className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900 tracking-tight"
+                    className="text-2xl sm:text-3xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
                 >
-                    Profile
+                    My Profile
                 </motion.h1>
 
                 <motion.div
                     variants={fadeIn}
-                    className="flex justify-center mb-6"
+                    className="flex justify-center mb-8"
                 >
-                    <div className="relative">
-                        <img
-                            src={previewImage || 'https://via.placeholder.com/150'}
-                            alt="Profile"
-                            className="w-32 h-32 rounded-full object-cover border-2 border-gray-300"
-                        />
+                    <div className="relative group">
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--border-color)] group-hover:border-blue-500 transition-colors duration-300">
+                            <img
+                                src={previewImage || 'https://via.placeholder.com/150'}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                         <input
                             type="file"
                             name="profileImage"
                             id="profileImage"
                             onChange={handleChange}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             accept="image/*"
                             aria-label="Upload Profile Image"
                         />
-                        <motion.label
-                            htmlFor="profileImage"
-                            whileHover="hover"
-                            variants={buttonHover}
-                            className="absolute bottom-0 right-0 bg-blue-600 text-white px-2 py-1 rounded-full text-xs cursor-pointer"
-                        >
-                            Upload
-                        </motion.label>
+                        <div className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-300 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                        </div>
                     </div>
                 </motion.div>
 
-                <form onSubmit={handleSubmit}>
-                    <motion.div variants={fadeIn} className="mb-6">
-                        <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                            Name
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <motion.div variants={fadeIn}>
+                        <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                            Full Name
                         </label>
                         <input
                             type="text"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
+                            className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                            placeholder="Enter your name"
                         />
                     </motion.div>
-                    <motion.div variants={fadeIn} className="mb-6">
-                        <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                            Email
+
+                    <motion.div variants={fadeIn}>
+                        <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                            Email Address
                         </label>
                         <input
                             type="email"
                             name="email"
                             value={formData.email}
                             disabled
-                            className="w-full p-4 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed text-sm sm:text-base"
+                            className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-gray-500 cursor-not-allowed"
                         />
                     </motion.div>
-                    <motion.div variants={fadeIn} className="mb-6">
-                        <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                            New Password (optional)
+
+                    <motion.div variants={fadeIn}>
+                        <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                            New Password <span className="text-gray-600 text-xs">(Optional)</span>
                         </label>
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
+                            className="w-full p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                            placeholder="••••••••"
                         />
                     </motion.div>
+
                     <motion.button
                         type="submit"
                         whileHover="hover"
                         variants={buttonHover}
-                        className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base mb-2"
-                        aria-label="Update Profile"
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300"
                     >
-                        Update Profile
+                        Save Changes
                     </motion.button>
+                </form>
+
+                <div className="mt-6 pt-6 border-t border-[var(--border-color)]">
                     <motion.button
                         onClick={handleLogout}
                         whileHover="hover"
-                        variants={buttonHover}
-                        className="w-full bg-red-600 text-white p-4 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 text-sm sm:text-base"
-                        aria-label="Logout"
+                        variants={logoutHover}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full bg-transparent border border-red-500/30 text-red-500 p-4 rounded-xl font-semibold hover:bg-red-500/10 transition-all duration-300 flex items-center justify-center space-x-2"
                     >
-                        Logout
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                        </svg>
+                        <span>Sign Out</span>
                     </motion.button>
-                </form>
+                </div>
             </motion.div>
         </div>
     );

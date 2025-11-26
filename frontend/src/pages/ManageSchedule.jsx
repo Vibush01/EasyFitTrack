@@ -3,8 +3,9 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 const ManageSchedule = () => {
     const { user } = useContext(AuthContext);
     const [schedules, setSchedules] = useState([]);
@@ -25,7 +26,7 @@ const ManageSchedule = () => {
                 setSchedules(res.data);
             } catch (err) {
                 setError('Failed to fetch schedules');
-                toast.error('Failed to fetch schedules'+err, { position: 'top-right' });
+                toast.error('Failed to fetch schedules' + err, { position: 'top-right' });
             }
         };
 
@@ -90,12 +91,12 @@ const ManageSchedule = () => {
     };
 
     const buttonHover = {
-        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', transition: { duration: 0.3 } },
+        hover: { scale: 1.05, boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)', transition: { duration: 0.3 } },
     };
 
     if (user?.role !== 'trainer') {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 transition-colors duration-300">
                 <motion.p
                     initial="hidden"
                     animate="visible"
@@ -109,140 +110,178 @@ const ManageSchedule = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="container mx-auto">
+        <div className="min-h-screen bg-[var(--bg-primary)] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+            {/* Background Elements */}
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center opacity-5 fixed"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/95 to-[var(--bg-primary)] fixed"></div>
+
+            <div className="container mx-auto max-w-5xl relative z-10">
                 <motion.h1
                     initial="hidden"
                     animate="visible"
                     variants={fadeIn}
-                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-900 tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold mb-8 text-center text-[var(--text-primary)] tracking-tight"
                 >
                     Manage Schedule
                 </motion.h1>
                 {error && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-red-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-8 text-center backdrop-blur-sm"
                     >
                         {error}
-                    </motion.p>
+                    </motion.div>
                 )}
                 {success && (
-                    <motion.p
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                        className="text-green-500 mb-6 text-center text-sm sm:text-base"
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-500/10 border border-green-500/50 text-green-500 p-4 rounded-xl mb-8 text-center backdrop-blur-sm"
                     >
                         {success}
-                    </motion.p>
+                    </motion.div>
                 )}
 
-                {/* Post Schedule Slot Form */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mb-8"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Post Free Schedule Slot</h2>
-                    <form onSubmit={handleSubmit}>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                Start Time
-                            </label>
-                            <input
-                                type="datetime-local"
-                                name="startTime"
-                                value={formData.startTime}
-                                onChange={handleChange}
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                required
-                            />
-                        </motion.div>
-                        <motion.div variants={fadeIn} className="mb-6">
-                            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-                                End Time
-                            </label>
-                            <input
-                                type="datetime-local"
-                                name="endTime"
-                                value={formData.endTime}
-                                onChange={handleChange}
-                                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm sm:text-base transition-all duration-300"
-                                required
-                            />
-                        </motion.div>
-                        <motion.button
-                            type="submit"
-                            whileHover="hover"
-                            variants={buttonHover}
-                            className="w-full bg-blue-600 text-white p-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 text-sm sm:text-base"
-                        >
-                            Post Slot
-                        </motion.button>
-                    </form>
-                </motion.div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Post Schedule Slot Form */}
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeIn}
+                        className="lg:col-span-1 bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)] h-fit"
+                    >
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                            <span className="bg-blue-600 w-1.5 h-8 rounded-full mr-3"></span>
+                            Add Slot
+                        </h2>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                                    Start Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="startTime"
+                                    value={formData.startTime}
+                                    onChange={handleChange}
+                                    className="w-full p-4 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[var(--text-secondary)] font-medium mb-2 text-sm">
+                                    End Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="endTime"
+                                    value={formData.endTime}
+                                    onChange={handleChange}
+                                    className="w-full p-4 bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                    required
+                                />
+                            </div>
+                            <motion.button
+                                type="submit"
+                                whileHover="hover"
+                                variants={buttonHover}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300"
+                            >
+                                Post Slot
+                            </motion.button>
+                        </form>
+                    </motion.div>
 
-                {/* Schedule Slots List */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl"
-                >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">Your Schedule Slots</h2>
-                    {schedules.length > 0 ? (
-                        <ul className="space-y-4">
-                            {schedules.map((schedule) => (
-                                <motion.li
-                                    key={schedule._id}
-                                    className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
-                                    variants={zoomIn}
-                                >
-                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
-                                        <strong>Start Time:</strong> {new Date(schedule.startTime).toLocaleString()}
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>End Time:</strong> {new Date(schedule.endTime).toLocaleString()}
-                                    </p>
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Status:</strong> {schedule.status}
-                                    </p>
-                                    {schedule.bookedBy && (
-                                        <p className="text-gray-600 text-sm sm:text-base">
-                                            <strong>Booked By:</strong> {schedule.bookedBy.name} ({schedule.bookedBy.email})
-                                        </p>
-                                    )}
-                                    <p className="text-gray-600 text-sm sm:text-base">
-                                        <strong>Created:</strong> {new Date(schedule.createdAt).toLocaleString()}
-                                    </p>
-                                    {schedule.status === 'available' && (
-                                        <motion.div className="mt-3">
-                                            <motion.button
-                                                onClick={() => handleDelete(schedule._id)}
-                                                whileHover="hover"
-                                                variants={buttonHover}
-                                                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all duration-300 text-sm sm:text-base"
-                                            >
-                                                Delete
-                                            </motion.button>
-                                        </motion.div>
-                                    )}
-                                </motion.li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-700 text-center text-sm sm:text-base">No schedule slots posted yet</p>
-                    )}
-                </motion.div>
+                    {/* Schedule Slots List */}
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeIn}
+                        className="lg:col-span-2 bg-[var(--bg-card)]/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl border border-[var(--border-color)]"
+                    >
+                        <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)] flex items-center">
+                            <span className="bg-purple-600 w-1.5 h-8 rounded-full mr-3"></span>
+                            Your Schedule Slots
+                        </h2>
+                        {schedules.length > 0 ? (
+                            <div className="space-y-4">
+                                {schedules.map((schedule) => (
+                                    <motion.div
+                                        key={schedule._id}
+                                        className="bg-[var(--bg-secondary)]/50 p-5 rounded-xl border border-[var(--border-color)] hover:border-purple-500/50 transition-all duration-300"
+                                        initial="hidden"
+                                        whileInView="visible"
+                                        viewport={{ once: true }}
+                                        variants={zoomIn}
+                                    >
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+                                            <div className="flex items-center space-x-2 mb-2 sm:mb-0">
+                                                <span className={`w-3 h-3 rounded-full ${schedule.status === 'available' ? 'bg-green-500' : 'bg-red-500'
+                                                    }`}></span>
+                                                <span className="text-[var(--text-primary)] font-semibold capitalize">{schedule.status}</span>
+                                            </div>
+                                            <span className="text-[var(--text-secondary)] text-xs">
+                                                Created: {new Date(schedule.createdAt).toLocaleDateString()}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                            <div className="bg-[var(--bg-primary)]/50 p-3 rounded-lg">
+                                                <p className="text-[var(--text-secondary)] text-xs uppercase mb-1">Start Time</p>
+                                                <p className="text-[var(--text-primary)] text-sm font-medium">
+                                                    {new Date(schedule.startTime).toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <div className="bg-[var(--bg-primary)]/50 p-3 rounded-lg">
+                                                <p className="text-[var(--text-secondary)] text-xs uppercase mb-1">End Time</p>
+                                                <p className="text-[var(--text-primary)] text-sm font-medium">
+                                                    {new Date(schedule.endTime).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {schedule.bookedBy && (
+                                            <div className="bg-blue-900/20 border border-blue-900/50 p-3 rounded-lg mb-4">
+                                                <p className="text-blue-400 text-xs uppercase mb-1">Booked By</p>
+                                                <p className="text-[var(--text-primary)] text-sm font-medium">
+                                                    {schedule.bookedBy.name} <span className="text-[var(--text-secondary)] font-normal">({schedule.bookedBy.email})</span>
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {schedule.status === 'available' && (
+                                            <div className="flex justify-end">
+                                                <motion.button
+                                                    onClick={() => handleDelete(schedule._id)}
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="bg-red-600/20 text-red-500 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-medium flex items-center"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
+                                                    Delete Slot
+                                                </motion.button>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-[var(--bg-secondary)]/50 p-12 rounded-xl text-center border border-[var(--border-color)] border-dashed">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-[var(--text-secondary)] mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-[var(--text-secondary)] text-lg font-medium">No schedule slots posted</p>
+                                <p className="text-[var(--text-secondary)] text-sm mt-2">Add your available times to let members book sessions.</p>
+                            </div>
+                        )}
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ const chatMessageSchema = new mongoose.Schema({
     receiverModel: { type: String, required: true, enum: ['Member', 'Trainer', 'Gym'] },
     gym: { type: mongoose.Schema.Types.ObjectId, ref: 'Gym', required: true },
     message: { type: String, required: true },
+    status: { type: String, enum: ['sent', 'read'], default: 'sent' },
     timestamp: { type: Date, default: Date.now },
 });
 
