@@ -21,7 +21,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: ['https://befit.vibushdigital.com', 'https://easyfittrack.netlify.app', 'http://localhost:5173'],
+        origin: '*',
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
     },
 });
@@ -29,7 +29,7 @@ const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors({
-    origin: ['https://befit.vibushdigital.com', 'https://easyfittrack.netlify.app', 'http://localhost:5173'], // Allow your frontend domain
+    origin: '*', // Allow your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
 }));
