@@ -83,6 +83,10 @@ const RequestPlan = () => {
         }
     }, [user]);
 
+    // Debug logs
+    console.log('Requests:', requests);
+    console.log('Plans:', plans);
+
     const handleRequest = async () => {
         if (!selectedTrainer) {
             toast.error('Please select a trainer', { position: "top-right" });
@@ -234,6 +238,9 @@ const RequestPlan = () => {
                                         <motion.div
                                             key={request._id}
                                             className="bg-[var(--bg-secondary)]/50 p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center"
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true }}
                                             variants={zoomIn}
                                         >
                                             <div>
@@ -274,6 +281,9 @@ const RequestPlan = () => {
                                         <motion.div
                                             key={index}
                                             className="bg-[var(--bg-secondary)]/50 p-5 rounded-xl border border-[var(--border-color)] hover:border-purple-500/50 transition-all duration-300"
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true }}
                                             variants={zoomIn}
                                         >
                                             <div className="flex justify-between items-start mb-3">

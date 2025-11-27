@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -29,6 +30,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const ProgressTracker = () => {
     const { user } = useContext(AuthContext);
+    const { theme } = useTheme();
     const [logs, setLogs] = useState([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -39,6 +41,43 @@ const ProgressTracker = () => {
         images: [],
     });
     const [uploading, setUploading] = useState(false);
+
+    // State for chart colors to ensure they match CSS variables
+    const [chartColors, setChartColors] = useState({
+        textColor: '#111827',
+        gridColor: '#e5e7eb',
+        secondaryTextColor: '#4b5563',
+    });
+
+    // Update chart colors when theme changes
+    useEffect(() => {
+        const updateColors = () => {
+            const root = document.documentElement;
+            const computedStyle = getComputedStyle(root);
+
+            // Get values from CSS variables
+            const textColor = computedStyle.getPropertyValue('--text-primary').trim();
+            const gridColor = computedStyle.getPropertyValue('--border-color').trim();
+            const secondaryTextColor = computedStyle.getPropertyValue('--text-secondary').trim();
+
+            // Fallback if variables are empty (e.g. initial load race condition)
+            const isDark = root.classList.contains('dark') || theme === 'dark';
+
+            setChartColors({
+                textColor: textColor || (isDark ? '#F3F4F6' : '#111827'),
+                gridColor: gridColor || (isDark ? '#374151' : '#e5e7eb'),
+                secondaryTextColor: secondaryTextColor || (isDark ? '#9CA3AF' : '#4b5563'),
+            });
+        };
+
+        // Immediate update
+        updateColors();
+
+        // Delayed update to ensure DOM class change has propagated
+        const timer = setTimeout(updateColors, 50);
+
+        return () => clearTimeout(timer);
+    }, [theme]);
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -133,23 +172,23 @@ const ProgressTracker = () => {
         plugins: {
             legend: {
                 position: 'top',
-                labels: { color: 'var(--text-secondary)' },
+                labels: { color: chartColors.secondaryTextColor },
             },
             title: {
                 display: true,
                 text: 'Progress Over Time',
-                color: 'var(--text-primary)',
+                color: chartColors.textColor,
                 font: { size: 16 },
             },
         },
         scales: {
             y: {
-                grid: { color: 'var(--border-color)' },
-                ticks: { color: 'var(--text-secondary)' },
+                grid: { color: chartColors.gridColor },
+                ticks: { color: chartColors.secondaryTextColor },
             },
             x: {
-                grid: { color: 'var(--border-color)' },
-                ticks: { color: 'var(--text-secondary)' },
+                grid: { color: chartColors.gridColor },
+                ticks: { color: chartColors.secondaryTextColor },
             },
         },
     };
@@ -323,7 +362,7 @@ const ProgressTracker = () => {
                             </h2>
                             <div className="h-80 w-full">
                                 {logs.length > 0 ? (
-                                    <Line data={chartData} options={chartOptions} />
+                                    <Line key={theme} data={chartData} options={chartOptions} />
                                 ) : (
                                     <div className="h-full flex items-center justify-center text-[var(--text-secondary)]">
                                         No data available for chart

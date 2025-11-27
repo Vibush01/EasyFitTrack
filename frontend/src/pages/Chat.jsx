@@ -354,7 +354,7 @@ const Chat = () => {
                                     onClick={handleSendMessage}
                                     whileHover="hover"
                                     variants={buttonHover}
-                                    className="bg-blue-600 text-white px-4 sm:px-8 py-3 sm:py-4 rounded-xl font-bold hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/20"
+                                    className="bg-blue-600 text-white px-4 sm:px-8 py-3 sm:py-4 rounded-xl font-bold hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/20 flex items-center justify-center"
                                 >
                                     Send
                                 </motion.button>
