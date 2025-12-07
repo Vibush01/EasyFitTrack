@@ -358,7 +358,7 @@ const Home = () => {
                 <div className="container mx-auto px-6 text-center">
                     <div className="flex items-center justify-center gap-2 mb-8">
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-xl">B</span>
+                            <span className="text-white font-bold text-xl">EFT</span>
                         </div>
                         <span className="text-[var(--text-primary)] text-2xl font-bold">EasyFit<span className="text-blue-500">Track</span></span>
                     </div>
