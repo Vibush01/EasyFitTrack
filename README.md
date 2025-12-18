@@ -1,6 +1,9 @@
 # EasyFitTrack
 
 🚀 **Live Demo:** [http://easyfittrack.netlify.app/](http://easyfittrack.netlify.app/)
+> **⚠️ Server Cold Start Notice:**
+> The backend is hosted on **Render's Free Tier**. To save resources, the server "spins down" after 15 minutes of inactivity.
+> **Please allow 20-30 seconds for the initial load** while the server wakes up. Once active, the application will perform at normal speed.
 
 **EasyFitTrack** is a comprehensive full-stack fitness management platform designed to bridge the gap between gym owners, trainers, and fitness enthusiasts. It provides a seamless ecosystem for managing gym operations, tracking workout progress, planning diets, and facilitating real-time communication.
 
